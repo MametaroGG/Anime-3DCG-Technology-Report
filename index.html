@@ -248,7 +248,8 @@
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <!-- Concept Visualizer 1: Raw Normals -->
-            <div class="interactive-card bg-white p-6 rounded-xl border border-gray-200 text-center group cursor-pointer"
+            <div id="card-raw"
+                class="interactive-card bg-white p-6 rounded-xl border border-gray-200 text-center group cursor-pointer"
                 onclick="updateNormalInfo('raw')">
                 <div
                     class="w-16 h-16 bg-gray-100 rounded-full mx-auto mb-4 flex items-center justify-center text-2xl group-hover:bg-red-100 transition">
@@ -259,7 +260,8 @@
             </div>
 
             <!-- Concept Visualizer 2: Adjusted Normals -->
-            <div class="interactive-card bg-white p-6 rounded-xl border-2 border-blue-500 text-center group cursor-pointer shadow-md"
+            <div id="card-adjusted"
+                class="interactive-card bg-white p-6 rounded-xl border-2 border-blue-500 text-center group cursor-pointer shadow-md"
                 onclick="updateNormalInfo('adjusted')">
                 <div
                     class="w-16 h-16 bg-blue-100 rounded-full mx-auto mb-4 flex items-center justify-center text-2xl group-hover:scale-110 transition">
@@ -270,7 +272,8 @@
             </div>
 
             <!-- Concept Visualizer 3: Flat/Symbolic -->
-            <div class="interactive-card bg-white p-6 rounded-xl border border-gray-200 text-center group cursor-pointer"
+            <div id="card-flat"
+                class="interactive-card bg-white p-6 rounded-xl border border-gray-200 text-center group cursor-pointer"
                 onclick="updateNormalInfo('flat')">
                 <div
                     class="w-16 h-16 bg-gray-100 rounded-full mx-auto mb-4 flex items-center justify-center text-2xl group-hover:bg-green-100 transition">
@@ -387,7 +390,7 @@
 
     <footer class="bg-white border-t border-gray-200 mt-12 py-8">
         <div class="max-w-7xl mx-auto px-4 text-center text-gray-500 text-sm">
-            <p>© 2023 Anime CG Research Report. Generated for Analysis.</p>
+            <p>© 2026 Anime CG Research Report. Generated for Analysis.</p>
         </div>
     </footer>
 
@@ -588,6 +591,28 @@
             // Update Visuals
             shadowVisual.style.background = data.gradient;
             normalDetailBox.className = `mt-8 ${data.boxColor} text-white p-6 rounded-xl shadow-inner transition-all duration-300`;
+
+            // Update Button Selection State
+            ['raw', 'adjusted', 'flat'].forEach(idKey => {
+                const card = document.getElementById(`card-${idKey}`);
+                const header = card.querySelector('h4');
+
+                if (idKey === key) {
+                    // Active State
+                    card.classList.remove('border', 'border-gray-200');
+                    card.classList.add('border-2', 'border-blue-500', 'shadow-md');
+
+                    header.classList.remove('text-gray-800');
+                    header.classList.add('text-blue-700');
+                } else {
+                    // Inactive State
+                    card.classList.remove('border-2', 'border-blue-500', 'shadow-md');
+                    card.classList.add('border', 'border-gray-200');
+
+                    header.classList.remove('text-blue-700');
+                    header.classList.add('text-gray-800');
+                }
+            });
         }
 
         // Initialize with default view (Adjusted)
