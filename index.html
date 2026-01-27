@@ -69,6 +69,22 @@
             border-radius: 8px;
             overflow: hidden;
         }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
     </style>
     <!-- Chosen Palette: "Studio Desk" - Warm Paper (#fdfbf7), Pencil Graphite (#2d3748), Anime Blue (#3182ce), Alert Red (#e53e3e) -->
     <!-- Application Structure Plan:
@@ -343,47 +359,379 @@
         </div>
     </section>
 
-    <!-- Pipeline / Workflow -->
-    <section id="pipeline" class="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <div class="bg-gray-800 rounded-3xl p-8 md:p-12 text-white shadow-xl">
-            <h3 class="text-2xl font-bold mb-6">制作フローの変革：3Dから2Dへ</h3>
-            <p class="text-gray-400 mb-8">違和感を消すための工程は、モデリング段階からコンポジット（撮影）まで一貫して行われます。</p>
+    <!-- Deep Dive: Professional Workflow Techniques -->
+    <section id="advanced-techniques"
+        class="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto bg-gray-50 my-12 rounded-3xl border border-gray-200">
+        <div class="text-center mb-10">
+            <h3 class="text-3xl font-extrabold text-gray-900">
+                プロフェッショナルの現場技術
+            </h3>
+            <p class="mt-4 text-gray-600 max-w-2xl mx-auto">
+                「キャラクター（作画）」と「背景（美術）」では、求められるリアリティの質が異なります。
+                それぞれのワークフローで標準的に採用されている高度な技術を解説します。
+            </p>
+        </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div class="bg-gray-700 p-4 rounded-lg relative">
-                    <div
-                        class="absolute -top-3 -right-3 w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center font-bold text-sm">
-                        1</div>
-                    <h4 class="font-bold text-blue-300 mb-2">モデリング</h4>
-                    <p class="text-xs text-gray-300">法線編集を前提としたトポロジー（ポリゴンの並び）を作成。影が汚くならないよう、形状の流れを整える。</p>
-                </div>
-                <div class="hidden md:block self-center text-center text-gray-500 text-2xl">→</div>
+        <!-- Tabs Navigation -->
+        <div class="flex justify-center mb-8">
+            <div class="bg-white p-1 rounded-xl shadow-sm border border-gray-200 inline-flex">
+                <button id="tab-char" onclick="switchTab('char')"
+                    class="px-6 py-3 rounded-lg text-sm font-bold transition-all duration-200 bg-blue-600 text-white shadow-md">
+                    🐱 キャラクター制作 (Character)
+                </button>
+                <button id="tab-bg" onclick="switchTab('bg')"
+                    class="px-6 py-3 rounded-lg text-sm font-bold text-gray-500 hover:text-gray-700 hover:bg-gray-50 transition-all duration-200 ml-2">
+                    🏞️ 背景美術 (Background)
+                </button>
+                <button id="tab-vfx" onclick="switchTab('vfx')"
+                    class="px-6 py-3 rounded-lg text-sm font-bold text-gray-500 hover:text-gray-700 hover:bg-gray-50 transition-all duration-200 ml-2">
+                    ⚡ 特殊効果と未来 (VFX)
+                </button>
+            </div>
+        </div>
 
-                <div class="bg-gray-700 p-4 rounded-lg relative">
-                    <div
-                        class="absolute -top-3 -right-3 w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center font-bold text-sm">
-                        2</div>
-                    <h4 class="font-bold text-blue-300 mb-2">セットアップ</h4>
-                    <p class="text-xs text-gray-300">リミテッドアニメ用のリグ構築。可動域よりも「シルエットの美しさ」を優先した骨格設定。</p>
-                </div>
-                <div class="hidden md:block self-center text-center text-gray-500 text-2xl">→</div>
-
-                <div class="bg-gray-700 p-4 rounded-lg relative">
-                    <div
-                        class="absolute -top-3 -right-3 w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center font-bold text-sm">
-                        3</div>
-                    <h4 class="font-bold text-blue-300 mb-2">アニメーション</h4>
-                    <p class="text-xs text-gray-300">「タメ」と「ツメ」を意識する。グラフエディタをステップ補間に変更し、ポーズのメリハリを作る。</p>
+        <!-- Content Area: Character -->
+        <div id="content-char" class="space-y-12 animate-fade-in block">
+            <!-- 1. Shader & Material -->
+            <div class="bg-white rounded-2xl p-8 shadow-sm border-l-8 border-blue-500">
+                <div class="flex items-start gap-4">
+                    <div class="bg-blue-100 p-3 rounded-lg text-2xl">🎨</div>
+                    <div>
+                        <h4 class="text-xl font-bold text-gray-900 mb-2">Shader & Material: 「愛される嘘」をつく</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-4">
+                            <div>
+                                <h5 class="font-bold text-blue-700 mb-1">トゥーンシェーダー & グラデーションマップ</h5>
+                                <p class="text-sm text-gray-600 leading-relaxed">
+                                    3Dの滑らかな陰影を、アニメ塗りの「パキッとした境界」に変換します。
+                                    さらに、影色を単に暗くするのではなく、「彩度の高い青紫色」などに置換するグラデーションマップ制御により、
+                                    アニメ特有の鮮やかな色彩設計を再現します。
+                                </p>
+                            </div>
+                            <div>
+                                <h5 class="font-bold text-blue-700 mb-1">SDF (符号付き距離場) 顔影制御</h5>
+                                <p class="text-sm text-gray-600 leading-relaxed">
+                                    <span class="bg-blue-100 text-blue-800 text-xs px-2 py-0.5 rounded">業界標準</span>
+                                    「原神」や「GUILTY GEAR」系で採用されている最先端技術。
+                                    顔のどこに影が落ちるべきかを、ライトの角度ごとに計算した「理想の影形状」としてテクスチャに焼き付けておきます。
+                                    これにより、鼻の形状モデルに関わらず、常に「作画崩壊しない美しい影」が表示されます。
+                                </p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <div class="mt-8 pt-8 border-t border-gray-600 text-center">
-                <h4 class="font-bold text-lg mb-2">そして「撮影（コンポジット）」へ</h4>
-                <p class="text-sm text-gray-400 max-w-2xl mx-auto">
-                    最終的な「画作り」はAfter Effectsなどのコンポジットツールで行われます。
-                    3Dが出力した素材に、手描きのブラシタッチや、アニメ特有のレンズフレア（パラ漏れなど）を加えることで、
-                    デジタルの冷たさを完全に払拭します。
-                </p>
+            <!-- 2. Camera & Rig -->
+            <div class="bg-white rounded-2xl p-8 shadow-sm border-l-8 border-blue-400">
+                <div class="flex items-start gap-4">
+                    <div class="bg-blue-50 p-3 rounded-lg text-2xl">🎥</div>
+                    <div>
+                        <h4 class="text-xl font-bold text-gray-900 mb-2">Camera & Rig: シルエット優先の構造</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-4">
+                            <div>
+                                <h5 class="font-bold text-gray-800 mb-1">嘘パース (Lie Perspective)</h5>
+                                <p class="text-sm text-gray-600 leading-relaxed">
+                                    決めポーズで手前にある手足を、ボーンスケール変更で物理的に巨大化させます。
+                                    カメラのレンズ効果だけに頼らず、モデル自体を変形させることで、作画の「ハッタリ」の効いた構図を再現します。
+                                </p>
+                            </div>
+                            <div>
+                                <h5 class="font-bold text-gray-800 mb-1">望遠レンズ効果 (Telephoto)</h5>
+                                <p class="text-sm text-gray-600 leading-relaxed">
+                                    キャラクターのアップショットでは、焦点距離80mm〜100mm以上の望遠レンズ設定を使用します。
+                                    広角レンズ特有の「顔の歪み（魚眼効果）」を排除し、2Dの平面的で整った顔立ちを保つためです。
+                                </p>
+                            </div>
+                            <div class="md:col-span-2 border-t border-gray-100 pt-4 mt-2">
+                                <h5 class="font-bold text-gray-800 mb-1">ブレンドシェイプ & リグ (BlendShape)</h5>
+                                <p class="text-sm text-gray-600 leading-relaxed">
+                                    <span class="bg-red-100 text-red-600 text-xs px-2 py-0.5 rounded mr-1">必須</span>
+                                    ボーン（骨）の移動だけでは、アニメ特有の記号的な表情（「＞＜」目や四角い口）は作れません。
+                                    これらは粘土のように頂点を変形させた「ブレンドシェイプ」で再現します。
+                                    また、肘や膝を曲げた際に潰れてしまう形状を、綺麗なシルエットに修正する「補助骨（Corrective Shape）」としても多用されます。
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. Composite -->
+            <div class="bg-white rounded-2xl p-8 shadow-sm border-l-8 border-indigo-500">
+                <div class="flex items-start gap-4">
+                    <div class="bg-indigo-100 p-3 rounded-lg text-2xl">✨</div>
+                    <div>
+                        <h4 class="text-xl font-bold text-gray-900 mb-2">Composite (撮影): 馴染ませの魔法</h4>
+                        <ul class="space-y-4 mt-4">
+                            <li class="flex flex-col md:flex-row gap-2 md:items-center border-b border-gray-100 pb-2">
+                                <span class="font-bold text-indigo-700 min-w-[140px]">色トレス (Color Trace)</span>
+                                <span class="text-sm text-gray-600">
+                                    キャラクターの輪郭線を「黒一色」にするのではなく、肌の周りは茶色、明るい服の周りはその服の濃い色、と馴染ませる処理。デジタルではPencil+などのライン抽出機能でエリアと色を制御します。
+                                </span>
+                            </li>
+                            <li class="flex flex-col md:flex-row gap-2 md:items-center border-b border-gray-100 pb-2">
+                                <span class="font-bold text-indigo-700 min-w-[140px]">パラ漏れ (Para-flare)</span>
+                                <span class="text-sm text-gray-600">
+                                    かつてのセル画撮影時に起きた、「透過光（ライト）」が隣のセル層に滲んでしまう現象。
+                                    デジタルではあえてこの「滲み」をシミュレートし、画面に温かみと発光感を与えます。
+                                </span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Content Area: Background -->
+        <div id="content-bg" class="space-y-12 animate-fade-in hidden">
+            <!-- 1. Material & Shader -->
+            <div class="bg-white rounded-2xl p-8 shadow-sm border-l-8 border-green-500">
+                <div class="flex items-start gap-4">
+                    <div class="bg-green-100 p-3 rounded-lg text-2xl">🖌️</div>
+                    <div>
+                        <h4 class="text-xl font-bold text-gray-900 mb-2">Material: 3Dをキャンバスにする</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-4">
+                            <div>
+                                <h5 class="font-bold text-green-700 mb-1">カメラマッピング (Projection)</h5>
+                                <p class="text-sm text-gray-600 leading-relaxed">
+                                    <span class="bg-green-100 text-green-800 text-xs px-2 py-0.5 rounded">業界標準</span>
+                                    熟練の美術スタッフが描いた一枚絵（美術ボード）を、簡易的な3Dジオメトリにプロジェクターのように投影して貼り付ける技術。
+                                    「手描きの筆致」と「3Dの奥行き移動」を両立させる、劇場版アニメ等の背景制作の主流技術です。
+                                </p>
+                            </div>
+                            <div>
+                                <h5 class="font-bold text-green-700 mb-1">水彩調フィルター (Kuwahara Filter)</h5>
+                                <p class="text-sm text-gray-600 leading-relaxed">
+                                    フル3Dで作成された背景の場合、そのままではシャープすぎます。
+                                    「Kuwaharaフィルター」やポスタリゼーション処理をかけることで、ディテールを意図的に潰し、筆で描いたような色面（タッチ）を作り出します。
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. Camera & Layout -->
+            <div class="bg-white rounded-2xl p-8 shadow-sm border-l-8 border-green-600">
+                <div class="flex items-start gap-4">
+                    <div class="bg-green-50 p-3 rounded-lg text-2xl">📐</div>
+                    <div>
+                        <h4 class="text-xl font-bold text-gray-900 mb-2">3D Layout: 設計図としての3D</h4>
+                        <p class="text-sm text-gray-600 mt-2 mb-4">
+                            「レイアウト（画面構成）」工程で3Dを使用し、監督の意図する画角、レンズ、被写界深度を厳密に決定します。
+                            MAPPAやOLMなどのスタジオでは、この3Dレイアウトを原画マンに渡し、それをなぞる（ガイドにする）ことで、
+                            複雑なパース背景とキャラクターの正確な整合性を担保しています。
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. Composite -->
+            <div class="bg-white rounded-2xl p-8 shadow-sm border-l-8 border-orange-500">
+                <div class="flex items-start gap-4">
+                    <div class="bg-orange-100 p-3 rounded-lg text-2xl">⛅</div>
+                    <div>
+                        <h4 class="text-xl font-bold text-gray-900 mb-2">Composite (撮影): 空気の演出</h4>
+                        <ul class="space-y-4 mt-4">
+                            <li class="flex flex-col md:flex-row gap-2 md:items-center border-b border-gray-100 pb-2">
+                                <span class="font-bold text-orange-700 min-w-[140px]">空気遠近 (Aerial Persp)</span>
+                                <span class="text-sm text-gray-600">
+                                    カメラからの距離（Z深度）に応じて、奥にある物体ほど「青白く（フォグ）」霞ませる処理。
+                                    3Dパスから深度情報（Z-Depth）を書き出し、After Effectsで合成することで、巨大なスケール感を表現します。
+                                </span>
+                            </li>
+                            <li class="flex flex-col md:flex-row gap-2 md:items-center border-b border-gray-100 pb-2">
+                                <span class="font-bold text-orange-700 min-w-[140px]">入射光 (God Rays)</span>
+                                <span class="text-sm text-gray-600">
+                                    窓からの光や木漏れ日を、ただ明るくするだけでなく「光の筋」として可視化するチンダル現象の表現。
+                                    画面の密度を上げ、ドラマチックな空間を演出する必須テクニックです。
+                                </span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Content Area: VFX & Future -->
+        <div id="content-vfx" class="space-y-12 animate-fade-in hidden">
+            <!-- 1. Particle Simulator -->
+            <div class="bg-white rounded-2xl p-8 shadow-sm border-l-8 border-purple-500">
+                <div class="flex items-start gap-4 mb-6">
+                    <div class="bg-purple-100 p-3 rounded-lg text-2xl">🪄</div>
+                    <div>
+                        <h4 class="text-xl font-bold text-gray-900 mb-2">VFX: 嘘の爆発、嘘の煙</h4>
+                        <p class="text-sm text-gray-600">
+                            リアルな流体シミュレーションは、アニメの世界では「情報量が多すぎて」浮いてしまいます。
+                            HoudiniやEffekseerなどのツールを使っても、あえて「コマを抜く」「色を単純化する」ことでアニメに馴染ませます。
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Canvas Area -->
+                <div class="bg-gray-900 rounded-xl p-4 text-center">
+                    <canvas id="vfxCanvas" width="600" height="300"
+                        class="w-full max-w-full bg-gray-900 cursor-crosshair rounded-lg border border-gray-700"></canvas>
+                    <div class="mt-4 flex justify-center gap-4">
+                        <button onclick="setVfxMode('real')" id="btn-vfx-real"
+                            class="px-4 py-2 rounded bg-gray-700 text-gray-300 text-sm hover:bg-gray-600 transition">🌍
+                            Real Physics</button>
+                        <button onclick="setVfxMode('anime')" id="btn-vfx-anime"
+                            class="px-4 py-2 rounded bg-purple-600 text-white text-sm shadow-lg shadow-purple-500/50 transition">✨
+                            Anime Style</button>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-2">画面内をクリック/タップしてエフェクトを発生させてください</p>
+                </div>
+            </div>
+
+            <!-- 2. Production Revolution -->
+            <div class="bg-white rounded-2xl p-8 shadow-sm border-l-8 border-indigo-600">
+                <div class="flex items-start gap-4">
+                    <div class="bg-indigo-100 p-3 rounded-lg text-2xl">🎮</div>
+                    <div>
+                        <h4 class="text-xl font-bold text-gray-900 mb-2">制作環境の革命 (Real-time & Mocap)</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-4">
+                            <div>
+                                <h5 class="font-bold text-indigo-700 mb-1">リアルタイムエンジン (UE5 / Unity)</h5>
+                                <p class="text-sm text-gray-600 leading-relaxed">
+                                    <span class="bg-indigo-100 text-indigo-800 text-xs px-2 py-0.5 rounded">トレンド</span>
+                                    従来の数時間かかるレンダリング（映像書き出し）を、ゲームエンジンを使って「リアルタイム」に行う手法。
+                                    「ガールズバンドクライ」等で採用され、ライティングやカメラワークをその場で試行錯誤できるため、クオリティが劇的に向上します。
+                                </p>
+                            </div>
+                            <div>
+                                <h5 class="font-bold text-indigo-700 mb-1">モーションキャプチャ x リミテッド</h5>
+                                <p class="text-sm text-gray-600 leading-relaxed">
+                                    アクターの動き（ヌルヌルした生データ）を、そのまま使うとアニメには合いません。
+                                    あえて「コマを間引く（ステップ化）」処理を行い、ポーズの「タメツメ」を強調することで、
+                                    リアルな演技感とアニメらしいケレン味を融合させます。
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. Future Tech (AI) -->
+            <div class="bg-white rounded-2xl p-8 shadow-sm border-l-8 border-gray-500">
+                <div class="flex items-start gap-4">
+                    <div class="bg-gray-100 p-3 rounded-lg text-2xl">🤖</div>
+                    <div>
+                        <h4 class="text-xl font-bold text-gray-900 mb-2">制作支援ツールとしてのAI</h4>
+                        <p class="text-sm text-gray-600 leading-relaxed mb-4">
+                            クリエイティブの核心部分ではなく、「品質管理」や「単純作業の効率化」においてAI技術の導入が進んでいます。
+                        </p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <h5 class="font-bold text-gray-700 text-sm">ノイズ除去 (Denoising)</h5>
+                                <p class="text-xs text-gray-500 mt-1">短時間のレンダリングで発生するザラザラしたノイズを、AIが推測して綺麗に除去する技術。</p>
+                            </div>
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <h5 class="font-bold text-gray-700 text-sm">高解像度化 (Upscaling)</h5>
+                                <p class="text-xs text-gray-500 mt-1">過去のSD画質作品のリマスターや、4K放送用に画質を引き上げる処理に活用されています。</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pipeline / Workflow -->
+    <section id="pipeline" class="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <div class="bg-gray-800 rounded-3xl p-8 md:p-12 text-white shadow-xl overflow-hidden relative">
+            <h3 class="text-2xl font-bold mb-10 text-center">制作フローの変革：3Dから2Dへ</h3>
+
+            <!-- Flow Container -->
+            <div class="flex flex-col md:flex-row gap-4 items-stretch relative z-10">
+
+                <!-- Step 1: Modeling -->
+                <div
+                    class="flex-1 bg-gray-700/50 border-2 border-blue-500/30 p-6 rounded-xl relative group hover:border-blue-400 transition-colors">
+                    <div
+                        class="absolute -top-3 -left-3 w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center font-bold text-sm shadow-lg">
+                        1</div>
+                    <div class="text-3xl mb-3">🧊</div>
+                    <h4 class="font-bold text-blue-300 mb-2">モデリング</h4>
+                    <p class="text-xs text-gray-300 leading-relaxed">法線編集を前提としたトポロジー設計。影の落ち方を計算して形状を作る。</p>
+                </div>
+
+                <!-- Arrow -->
+                <div class="hidden md:flex items-center justify-center text-gray-500">
+                    <svg class="w-6 h-6 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                    </svg>
+                </div>
+                <div class="md:hidden flex justify-center text-gray-500 py-2">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                    </svg>
+                </div>
+
+                <!-- Step 2: Setup -->
+                <div
+                    class="flex-1 bg-gray-700/50 border-2 border-indigo-500/30 p-6 rounded-xl relative group hover:border-indigo-400 transition-colors">
+                    <div
+                        class="absolute -top-3 -left-3 w-8 h-8 bg-indigo-500 rounded-full flex items-center justify-center font-bold text-sm shadow-lg">
+                        2</div>
+                    <div class="text-3xl mb-3">🦴</div>
+                    <h4 class="font-bold text-indigo-300 mb-2">セットアップ</h4>
+                    <p class="text-xs text-gray-300 leading-relaxed">可動域より「シルエット」優先。嘘パース用の補助ボーンを仕込む。</p>
+                </div>
+
+                <!-- Arrow -->
+                <div class="hidden md:flex items-center justify-center text-gray-500">
+                    <svg class="w-6 h-6 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                    </svg>
+                </div>
+                <div class="md:hidden flex justify-center text-gray-500 py-2">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                    </svg>
+                </div>
+
+                <!-- Step 3: Animation -->
+                <div
+                    class="flex-1 bg-gray-700/50 border-2 border-purple-500/30 p-6 rounded-xl relative group hover:border-purple-400 transition-colors">
+                    <div
+                        class="absolute -top-3 -left-3 w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center font-bold text-sm shadow-lg">
+                        3</div>
+                    <div class="text-3xl mb-3">🎬</div>
+                    <h4 class="font-bold text-purple-300 mb-2">アニメーション</h4>
+                    <p class="text-xs text-gray-300 leading-relaxed">タメツメを意識したリミテッド制作。グラフエディタでコマを抜く。</p>
+                </div>
+            </div>
+
+            <!-- Connector to Final -->
+            <div class="flex justify-center py-6">
+                <div class="h-8 w-0.5 bg-gradient-to-b from-gray-600 to-pink-500 hidden md:block"></div>
+                <svg class="w-6 h-6 text-pink-500 md:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                </svg>
+            </div>
+
+            <!-- Step 4: Composite (Grand Finale) -->
+            <div
+                class="bg-gradient-to-r from-gray-800 to-gray-750 border border-pink-500/50 p-8 rounded-2xl relative shadow-2xl overflow-hidden mt-2">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-pink-500 blur-[80px] opacity-20 pointer-events-none">
+                </div>
+                <div class="flex flex-col md:flex-row items-center gap-6 relative z-10">
+                    <div
+                        class="flex-shrink-0 w-16 h-16 bg-gradient-to-br from-pink-500 to-red-600 rounded-2xl flex items-center justify-center text-3xl shadow-lg transform rotate-3">
+                        ✨</div>
+                    <div class="text-center md:text-left">
+                        <h4 class="text-xl font-bold text-white mb-2">撮影 (Composite) - 魔法をかける場所</h4>
+                        <p class="text-sm text-gray-300 leading-relaxed">
+                            ここが分水嶺です。3D素材に「手描きのブラシタッチ」「パラ漏れ」「撮影処理」を加えることで、デジタルの冷たさを完全に払拭し、温かいアニメのルックへ昇華させます。
+                        </p>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
@@ -618,6 +966,168 @@
         // Initialize with default view (Adjusted)
         updateNormalInfo('adjusted');
 
+        // --- 5. Tab Switching Logic for Advanced Techniques ---
+        function switchTab(type) {
+            const tabs = ['char', 'bg', 'vfx'];
+
+            tabs.forEach(t => {
+                const btn = document.getElementById(`tab-${t}`);
+                const content = document.getElementById(`content-${t}`);
+
+                if (t === type) {
+                    // Show Content
+                    content.classList.remove('hidden');
+                    content.classList.add('block');
+
+                    // Active Button Style
+                    let activeClass = 'bg-blue-600'; // Default Char
+                    if (t === 'bg') activeClass = 'bg-green-600';
+                    if (t === 'vfx') activeClass = 'bg-purple-600';
+
+                    btn.classList.add(activeClass, 'text-white', 'shadow-md');
+                    btn.classList.remove('text-gray-500', 'hover:text-gray-700', 'hover:bg-gray-50');
+                } else {
+                    // Hide Content
+                    content.classList.remove('block');
+                    content.classList.add('hidden');
+
+                    // Inactive Button Style
+                    btn.classList.remove('bg-blue-600', 'bg-green-600', 'bg-purple-600', 'text-white', 'shadow-md');
+                    btn.classList.add('text-gray-500', 'hover:text-gray-700', 'hover:bg-gray-50');
+                }
+            });
+
+            // Adjust VFX canvas size if visible
+            if (type === 'vfx') {
+                resizeVfxCanvas();
+            }
+        }
+
+        // --- 6. Particle Simulator Logic ---
+        const vfxCanvas = document.getElementById('vfxCanvas');
+        const vfxCtx = vfxCanvas.getContext('2d');
+        let vfxMode = 'anime'; // 'real' or 'anime'
+        let particles = [];
+        let vfxAnimationId;
+
+        function setVfxMode(mode) {
+            vfxMode = mode;
+            // Update buttons
+            document.getElementById('btn-vfx-real').className = mode === 'real'
+                ? 'px-4 py-2 rounded bg-blue-500 text-white text-sm shadow-lg shadow-blue-500/50 transition'
+                : 'px-4 py-2 rounded bg-gray-700 text-gray-300 text-sm hover:bg-gray-600 transition';
+
+            document.getElementById('btn-vfx-anime').className = mode === 'anime'
+                ? 'px-4 py-2 rounded bg-purple-600 text-white text-sm shadow-lg shadow-purple-500/50 transition'
+                : 'px-4 py-2 rounded bg-gray-700 text-gray-300 text-sm hover:bg-gray-600 transition';
+        }
+
+        function resizeVfxCanvas() {
+            const rect = vfxCanvas.parentElement.getBoundingClientRect();
+            vfxCanvas.width = rect.width - 32; // padding
+            vfxCanvas.height = 300;
+        }
+        window.addEventListener('resize', resizeVfxCanvas);
+
+        class Particle {
+            constructor(x, y, mode) {
+                this.x = x;
+                this.y = y;
+                this.mode = mode;
+                const angle = Math.random() * Math.PI * 2;
+                const speed = Math.random() * 2 + 1;
+                this.vx = Math.cos(angle) * speed;
+                this.vy = Math.sin(angle) * speed;
+                this.life = 1.0;
+
+                if (mode === 'anime') {
+                    this.vx *= 1.5; // Faster, snappier
+                    this.vy *= 1.5;
+                    this.size = Math.random() * 15 + 5;
+                    this.color = `hsl(${Math.random() * 60 + 10}, 100%, 60%)`; // Fire colors
+                    this.decay = 0.05; // Fast decay (limited frames)
+                } else {
+                    this.size = Math.random() * 3 + 1;
+                    this.color = `rgba(255, 100, 50, 0.8)`;
+                    this.decay = 0.01; // Slow smooth decay
+                }
+            }
+
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                this.life -= this.decay;
+
+                if (this.mode === 'real') {
+                    this.vy += 0.05; // Gravity
+                }
+            }
+
+            draw(ctx) {
+                ctx.beginPath();
+                if (this.mode === 'anime') {
+                    // Anime: Solid circles, shrinking, no alpha fade until end
+                    const drawSize = this.size * (this.life > 0.5 ? 1 : 0.5); // Stepped size
+                    ctx.fillStyle = this.color;
+                    ctx.arc(this.x, this.y, drawSize, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    // Add outline
+                    ctx.strokeStyle = 'white';
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                } else {
+                    // Real: Smooth alpha fade, soft edges
+                    ctx.globalAlpha = this.life;
+                    ctx.fillStyle = this.color;
+                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.globalAlpha = 1.0;
+                }
+            }
+        }
+
+        function loopVfx() {
+            // Anime mode: Update less frequently to simulate limited animation (e.g. on 2s or 3s)
+            // But for smooth UI, we'll just update physics every frame but draw differently
+
+            vfxCtx.clearRect(0, 0, vfxCanvas.width, vfxCanvas.height);
+
+            // Generate automatic particles occasionally
+            if (Math.random() < 0.05) {
+                const cx = vfxCanvas.width / 2;
+                const cy = vfxCanvas.height / 2;
+                createExplosion(cx, cy);
+            }
+
+            for (let i = particles.length - 1; i >= 0; i--) {
+                const p = particles[i];
+                p.update();
+                p.draw(vfxCtx);
+                if (p.life <= 0) {
+                    particles.splice(i, 1);
+                }
+            }
+
+            vfxAnimationId = requestAnimationFrame(loopVfx);
+        }
+
+        function createExplosion(x, y) {
+            const count = vfxMode === 'anime' ? 8 : 50; // Anime uses fewer, bolder shapes
+            for (let i = 0; i < count; i++) {
+                particles.push(new Particle(x, y, vfxMode));
+            }
+        }
+
+        vfxCanvas.addEventListener('mousedown', (e) => {
+            const rect = vfxCanvas.getBoundingClientRect();
+            createExplosion(e.clientX - rect.left, e.clientY - rect.top);
+        });
+
+        // Start loop
+        loopVfx();
+        setVfxMode('anime'); // Initialize VFX mode to anime
+        resizeVfxCanvas();
     </script>
 </body>
 
