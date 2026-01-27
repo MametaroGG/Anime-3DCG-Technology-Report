@@ -117,7 +117,7 @@
             <p class="text-lg text-gray-600 max-w-3xl mx-auto leading-relaxed">
                 現代のアニメ制作において3DCGは不可欠です。しかし、物理的に正しい3D計算は、
                 日本のアニメが培ってきた「省略の美学」と衝突し、視聴者に強い違和感（不気味の谷）を与えます。
-                本レポートでは、この違和感を解消し、3Dを「手描き」に翻訳するための主要技術を解説します。
+                本レポートでは、この違和感を解消し、3Dで「手描き」のニュアンスを再現するための主要技術を解説します。
             </p>
         </div>
 
@@ -255,7 +255,7 @@
                     🤖
                 </div>
                 <h4 class="font-bold text-gray-800">物理的に正しい法線</h4>
-                <p class="text-xs text-gray-500 mt-2">凹凸に正直に反応。シワや毛穴のような細かすぎる影が発生し、キャラクターが老けて見える。</p>
+                <p class="text-xs text-gray-500 mt-2">形状を忠実に反映。シワや微細な凹凸まで影として描画されるため、キャラクターが老けた印象に見えてしまうことがある。</p>
             </div>
 
             <!-- Concept Visualizer 2: Adjusted Normals -->
@@ -333,7 +333,7 @@
                     <h4 class="text-lg font-bold text-gray-800">嘘パース (Deformation)</h4>
                     <p class="text-sm text-gray-600 mt-2">
                         3Dのカメラは正確な遠近法しか描けませんが、アニメの迫力ある構図（パンチの瞬間に拳が巨大化するなど）はパースを無視します。
-                        これを再現するため、カメラに映る頂点座標をボーン（骨格）で無理やり歪ませるリグ（仕組み）を組み込みます。
+                        これを再現するため、カメラに映る頂点座標をボーン（骨格）で意図的に歪ませるリグ（仕組み）を組み込みます。
                     </p>
                 </div>
             </div>
@@ -352,7 +352,7 @@
                         class="absolute -top-3 -right-3 w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center font-bold text-sm">
                         1</div>
                     <h4 class="font-bold text-blue-300 mb-2">モデリング</h4>
-                    <p class="text-xs text-gray-300">法線編集を前提としたトポロジー（ポリゴンの並び）を作成。影が汚くなる凹凸を作らない。</p>
+                    <p class="text-xs text-gray-300">法線編集を前提としたトポロジー（ポリゴンの並び）を作成。影が汚くならないよう、形状の流れを整える。</p>
                 </div>
                 <div class="hidden md:block self-center text-center text-gray-500 text-2xl">→</div>
 
@@ -370,7 +370,7 @@
                         class="absolute -top-3 -right-3 w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center font-bold text-sm">
                         3</div>
                     <h4 class="font-bold text-blue-300 mb-2">アニメーション</h4>
-                    <p class="text-xs text-gray-300">タメツメの意識。グラフエディタをステップ補間に変更し、ポーズのキメを作る。</p>
+                    <p class="text-xs text-gray-300">「タメ」と「ツメ」を意識する。グラフエディタをステップ補間に変更し、ポーズのメリハリを作る。</p>
                 </div>
             </div>
 
@@ -496,9 +496,9 @@
 
         // Simulation variables
         const fpsSettings = {
-            3: { fps: 60, label: "60 FPS (Raw 3D)", text: "滑らかすぎて「人形っぽい」動きです。重量感が感じられにくい状態です。", color: "text-red-600", bg: "bg-red-50", border: "border-red-500" },
-            2: { fps: 24, label: "24 FPS (TV Anime)", text: "標準的なTVアニメのレート。滑らかさとメリハリのバランスが良い状態です。", color: "text-blue-600", bg: "bg-blue-50", border: "border-blue-500" },
-            1: { fps: 12, label: "12 FPS (Limited)", text: "コマ落ち感がありますが、ポーズが強調され、アクションシーンなどで迫力が出ます。", color: "text-purple-600", bg: "bg-purple-50", border: "border-purple-500" }
+            3: { fps: 60, label: "60 FPS (Raw 3D)", text: "滑らかすぎて、まるで人形のような動きに見えます。重量感や質感が伝わりにくい状態です。", color: "text-red-600", bg: "bg-red-50", border: "border-red-500" },
+            2: { fps: 24, label: "24 FPS (TV Anime)", text: "標準的なTVアニメのフレームレートです。滑らかさと動きのメリハリのバランスが取れています。", color: "text-blue-600", bg: "bg-blue-50", border: "border-blue-500" },
+            1: { fps: 12, label: "12 FPS (Limited)", text: "コマが飛ぶ感覚はありますが、ポーズが強調されるため、特にアクションシーンなどで迫力が生まれます。", color: "text-purple-600", bg: "bg-purple-50", border: "border-purple-500" }
         };
 
         // Custom Animation Loop to simulate specific FPS
@@ -552,7 +552,7 @@
         const normalData = {
             'raw': {
                 title: '選択中の技術: 物理的に正しい法線',
-                desc: 'モデルの凹凸に正直に反応して影が落ちます。鼻の横や口元に意図しない影ができやすく、特に女性キャラや子供キャラでは「可愛くない」原因になります。',
+                desc: 'モデルの形状を忠実に反映して影が落ちます。鼻の横や口元に意図しない影ができやすく、特に女性や子供のキャラクターでは可愛らしさを損なう原因になります。',
                 caption: '複雑でガタついた境界',
                 gradient: 'radial-gradient(circle at 30% 30%, #555, #000)', // Simulate complex/dark shading
                 boxColor: 'bg-red-900',
@@ -568,7 +568,7 @@
             },
             'flat': {
                 title: '選択中の技術: 完全な嘘 (記号的影)',
-                desc: '光源計算を放棄し、テクスチャに直接影を描き込んだり、シェーダーで強制的に「顔の半分は常に明るい」と定義する手法。角度を変えると破綻しやすいですが、決めカットでは最強です。',
+                desc: '光源計算を行わず、テクスチャに直接影を描き込んだり、シェーダーで「顔の半分は常に明るい」と強制的に定義する手法。角度を変えると破綻しやすいですが、決めカットでは絶大な効果を発揮します。',
                 caption: '完全に二極化した境界',
                 gradient: 'linear-gradient(90deg, #ffffff 50%, #000000 50%)', // Hard cut
                 boxColor: 'bg-green-900',
