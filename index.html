@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>アニメCGの「違和感」を消す技術レポート</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&display=swap"
+        rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans JP', sans-serif;
+            background-color: #fdfbf7;
+            /* Warm paper-like background */
+            color: #2d3748;
+        }
+
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+
+        .interactive-card {
+            transition: all 0.3s ease;
+        }
+
+        .interactive-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Custom Utilities for Diagram Shapes */
+        .triangle-up {
+            width: 0;
+            height: 0;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-bottom: 20px solid #4a5568;
+        }
+
+        .ball {
+            width: 40px;
+            height: 40px;
+            background-color: #ef4444;
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        #anim-track {
+            position: relative;
+            height: 80px;
+            width: 100%;
+            background-color: #e2e8f0;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+    </style>
+    <!-- Chosen Palette: "Studio Desk" - Warm Paper (#fdfbf7), Pencil Graphite (#2d3748), Anime Blue (#3182ce), Alert Red (#e53e3e) -->
+    <!-- Application Structure Plan:
+        1. Hero Section: Defines the core conflict (3D Realism vs. 2D Aesthetic).
+        2. The "Uncanny" Breakdown (Radar Chart): Visualizes where raw 3D fails against hand-drawn criteria.
+        3. Core Techniques Dashboard: The main interactive area. Uses a tabbed interface to switch between three major pillars:
+           - Motion (Frame Modulation): Includes a live animation simulator to compare 60fps vs 12fps (Limited Animation).
+           - Shading (Normals & Toon): Explains "Normal Editing" with an interactive normal vector adjuster concept.
+           - Geometry (Outline/Inverted Hull): Visualizes how lines are generated.
+        4. Workflow Integration (Process Flow): A step-by-step interactive vertical list showing the pipeline.
+        5. Future Trends: Summary of AI and real-time rendering.
+        Rationale: This structure moves from the "Why" (Uncanny Valley) to the "How" (Techniques) interactively, allowing users to "feel" the difference in motion and look.
+    -->
+    <!-- Visualization & Content Choices:
+        - Radar Chart: Comparison of "Fluidity", "Shadow Control", "Line Weight", "Texture" between Raw 3D and Hand-drawn. Goal: Visualize the gap.
+        - Animation Simulator (JS/CSS): A moving ball that switches between linear interpolation (smooth) and stepped animation (limited). Goal: Demonstrate "Komauchi" (frame dropping).
+        - Bar Chart: Usage of specific techniques across studio types. Goal: Show industry adoption.
+        - Interactive Diagrams: CSS shapes to represent Normal vectors. Goal: Explain complex geometry concepts without heavy 3D files.
+        - Confirmation: NO SVG. NO Mermaid.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+</head>
+
+<body class="antialiased">
+
+    <!-- Navigation / Header -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+            <h1 class="text-xl font-bold text-gray-800 tracking-tight">CG×Anime <span class="text-blue-600">Technique
+                    Lab</span></h1>
+            <nav class="hidden md:flex space-x-6 text-sm font-medium text-gray-500">
+                <a href="#intro" class="hover:text-blue-600 transition">課題 (The Challenge)</a>
+                <a href="#motion" class="hover:text-blue-600 transition">動き (Motion)</a>
+                <a href="#shading" class="hover:text-blue-600 transition">見た目 (Look)</a>
+                <a href="#pipeline" class="hover:text-blue-600 transition">工程 (Pipeline)</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section id="intro" class="pt-12 pb-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <div class="text-center mb-10">
+            <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4">
+                なぜ、その3DCGは<br class="md:hidden" />「ヌルヌル」して見えるのか？
+            </h2>
+            <p class="text-lg text-gray-600 max-w-3xl mx-auto leading-relaxed">
+                現代のアニメ制作において3DCGは不可欠です。しかし、物理的に正しい3D計算は、
+                日本のアニメが培ってきた「省略の美学」と衝突し、視聴者に強い違和感（不気味の谷）を与えます。
+                本レポートでは、この違和感を解消し、3Dを「手描き」に翻訳するための主要技術を解説します。
+            </p>
+        </div>
+
+        <!-- Metric: The Gap Visualized -->
+        <div class="bg-white rounded-xl shadow-lg p-6 md:p-8 border border-gray-100">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                <div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-2">違和感の正体：リアリズム vs アニメ的表現</h3>
+                    <p class="text-gray-600 text-sm mb-4">
+                        物理シミュレーションによる「正確すぎる動き」や「滑らかすぎる陰影」が、アニメ的な記号論と乖離することで違和感が生まれます。
+                        右のチャートは、Raw（未調整）の3D出力と、目指すべきアニメルックのギャップを示しています。
+                    </p>
+                    <ul class="space-y-2 text-sm text-gray-600">
+                        <li class="flex items-center">
+                            <span class="w-3 h-3 bg-red-400 rounded-full mr-2"></span>
+                            Raw 3D: 正確だが情報過多、均一な動き
+                        </li>
+                        <li class="flex items-center">
+                            <span class="w-3 h-3 bg-blue-500 rounded-full mr-2"></span>
+                            Anime Style: 意図的な嘘、メリハリ、情報の整理
+                        </li>
+                    </ul>
+                </div>
+                <div class="chart-container bg-gray-50 rounded-lg p-2">
+                    <canvas id="gapRadarChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Core Interactive Section: Motion & Timing -->
+    <section id="motion" class="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto bg-gray-50 rounded-3xl my-8">
+        <div class="mb-8">
+            <h3 class="text-2xl font-bold text-gray-900 flex items-center">
+                <span class="bg-blue-600 text-white p-2 rounded-lg text-sm mr-3">技術 01</span>
+                コマ打ち (Limited Animation)
+            </h3>
+            <p class="mt-2 text-gray-600">
+                3DCGのデフォルトは60fps（毎秒60フレーム）の滑らかな動きですが、リミテッドアニメ（日本の商業アニメ）は通常8〜24fps（3コマ打ち、2コマ打ち）で描かれます。
+                フレームレートを意図的に下げることで、力強さとリズムを生み出します。
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+            <!-- Simulator -->
+            <div class="bg-white p-6 rounded-xl shadow-md border border-gray-200">
+                <h4 class="font-bold text-gray-800 mb-4 text-center">フレームレート体感シミュレーター</h4>
+
+                <div id="anim-track" class="mb-6 relative">
+                    <!-- Grid lines for visual reference -->
+                    <div class="absolute inset-0 grid grid-cols-12 gap-0 pointer-events-none">
+                        <div class="border-r border-gray-300 h-full"></div>
+                        <div class="border-r border-gray-300 h-full"></div>
+                        <div class="border-r border-gray-300 h-full"></div>
+                        <div class="border-r border-gray-300 h-full"></div>
+                        <div class="border-r border-gray-300 h-full"></div>
+                        <div class="border-r border-gray-300 h-full"></div>
+                        <div class="border-r border-gray-300 h-full"></div>
+                        <div class="border-r border-gray-300 h-full"></div>
+                        <div class="border-r border-gray-300 h-full"></div>
+                        <div class="border-r border-gray-300 h-full"></div>
+                        <div class="border-r border-gray-300 h-full"></div>
+                    </div>
+                    <div id="bouncing-ball" class="ball shadow-lg"></div>
+                </div>
+
+                <div class="space-y-6">
+                    <div>
+                        <div class="flex justify-between mb-2">
+                            <span class="text-sm font-semibold text-gray-700">FPS設定: <span id="fps-label"
+                                    class="text-blue-600">60 FPS (Raw 3D)</span></span>
+                        </div>
+                        <input type="range" id="fps-slider" min="1" max="3" step="1" value="3"
+                            class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                        <div class="flex justify-between text-xs text-gray-500 mt-1">
+                            <span>低 (8-12fps)</span>
+                            <span>中 (24fps)</span>
+                            <span>高 (60fps)</span>
+                        </div>
+                    </div>
+
+                    <div id="fps-description"
+                        class="bg-blue-50 p-4 rounded-lg text-sm text-blue-800 border-l-4 border-blue-500">
+                        滑らかすぎて「人形っぽい」動きです。重量感が感じられにくい状態です。
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats/Context -->
+            <div>
+                <h4 class="font-bold text-gray-800 mb-4">手法による印象の違い</h4>
+                <div class="space-y-4">
+                    <div class="bg-white p-4 rounded-lg shadow-sm border-l-4 border-red-400">
+                        <h5 class="font-bold text-gray-900">フルコマ (Full Animation)</h5>
+                        <p class="text-sm text-gray-600 mt-1">
+                            1秒間に24枚以上の絵を使う。ディズニーやピクサーの手法。滑らかだが、日本のアニメ文脈では「CG臭さ」の原因になりやすい。</p>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg shadow-sm border-l-4 border-blue-500">
+                        <h5 class="font-bold text-gray-900">リミテッド (Limited Animation)</h5>
+                        <p class="text-sm text-gray-600 mt-1">
+                            「タメ」と「ツメ」を強調するためにコマを抜く。重要なポーズ（キーフレーム）を長く見せ、中割りを減らすことでメリハリをつける。</p>
+                    </div>
+                </div>
+
+                <div class="mt-6">
+                    <h4 class="font-bold text-gray-800 mb-2 text-sm">採用率の推移 (推計)</h4>
+                    <div class="chart-container" style="height: 200px;">
+                        <canvas id="fpsAdoptionChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Core Interactive Section: Shading & Geometry -->
+    <section id="shading" class="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <div class="mb-10">
+            <h3 class="text-2xl font-bold text-gray-900 flex items-center">
+                <span class="bg-blue-600 text-white p-2 rounded-lg text-sm mr-3">技術 02</span>
+                法線編集と影の制御 (Normal Editing)
+            </h3>
+            <p class="mt-2 text-gray-600 max-w-4xl">
+                3Dモデルの表面にある「法線（Normal）」は、光の反射方向を決定します。
+                人体の正しい法線をそのまま使うと、頬や鼻にリアルすぎて汚い影が落ちてしまいます。
+                アニメ調にするには、法線を「球体」や「平面」に近似させて、意図的に影をコントロールします。
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Concept Visualizer 1: Raw Normals -->
+            <div class="interactive-card bg-white p-6 rounded-xl border border-gray-200 text-center group cursor-pointer"
+                onclick="updateNormalInfo('raw')">
+                <div
+                    class="w-16 h-16 bg-gray-100 rounded-full mx-auto mb-4 flex items-center justify-center text-2xl group-hover:bg-red-100 transition">
+                    🤖
+                </div>
+                <h4 class="font-bold text-gray-800">物理的に正しい法線</h4>
+                <p class="text-xs text-gray-500 mt-2">凹凸に正直に反応。シワや毛穴のような細かすぎる影が発生し、キャラクターが老けて見える。</p>
+            </div>
+
+            <!-- Concept Visualizer 2: Adjusted Normals -->
+            <div class="interactive-card bg-white p-6 rounded-xl border-2 border-blue-500 text-center group cursor-pointer shadow-md"
+                onclick="updateNormalInfo('adjusted')">
+                <div
+                    class="w-16 h-16 bg-blue-100 rounded-full mx-auto mb-4 flex items-center justify-center text-2xl group-hover:scale-110 transition">
+                    ✨
+                </div>
+                <h4 class="font-bold text-blue-700">編集された法線 (球転写)</h4>
+                <p class="text-xs text-gray-500 mt-2">顔の法線を簡易な「球」や「円柱」から転写。光の当たり方が単純化され、アニメ特有の綺麗なグラデーションになる。</p>
+            </div>
+
+            <!-- Concept Visualizer 3: Flat/Symbolic -->
+            <div class="interactive-card bg-white p-6 rounded-xl border border-gray-200 text-center group cursor-pointer"
+                onclick="updateNormalInfo('flat')">
+                <div
+                    class="w-16 h-16 bg-gray-100 rounded-full mx-auto mb-4 flex items-center justify-center text-2xl group-hover:bg-green-100 transition">
+                    🎨
+                </div>
+                <h4 class="font-bold text-gray-800">完全な嘘 (記号的影)</h4>
+                <p class="text-xs text-gray-500 mt-2">テクスチャに直接影を描き込む、あるいは光源位置を無視して「見栄えが良い位置」に影を固定する手法。</p>
+            </div>
+        </div>
+
+        <!-- Dynamic Explanation Box -->
+        <div id="normal-detail-box"
+            class="mt-8 bg-slate-800 text-white p-6 rounded-xl shadow-inner transition-all duration-300">
+            <h4 class="text-lg font-bold text-blue-300 mb-2">選択中の技術: 編集された法線 (球転写)</h4>
+            <div class="flex flex-col md:flex-row gap-6">
+                <div class="flex-1">
+                    <p class="text-sm leading-relaxed text-gray-300">
+                        「ギルティギア」シリーズや「宝石の国」などで有名になった手法。
+                        3Dモデルの複雑な顔形状の法線情報を、シンプルな球体の法線情報で上書き（転写）します。
+                        これにより、顔をどの方角から照らしても、影の境界線（ターミネーターライン）が
+                        ガタつかず、手書きのアニメのような滑らかな曲線を描くようになります。
+                    </p>
+                </div>
+                <div class="md:w-1/3 bg-slate-700 rounded-lg p-4 flex flex-col justify-center items-center">
+                    <div class="text-xs text-gray-400 mb-2">影の境界線のイメージ</div>
+                    <div id="shadow-visual"
+                        class="w-24 h-24 rounded-full bg-gradient-to-tr from-black to-white border-4 border-slate-600 transition-all duration-500">
+                    </div>
+                    <div class="mt-2 text-xs text-center text-blue-200" id="shadow-caption">滑らかで単純な境界</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Additional Techniques List (Outline & Deformation) -->
+    <section class="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto bg-white border-t border-gray-100">
+        <h3 class="text-2xl font-bold text-gray-900 mb-8">その他の重要アプローチ</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <!-- Technique 3 -->
+            <div class="flex gap-4">
+                <div
+                    class="flex-shrink-0 w-12 h-12 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center font-bold">
+                    03</div>
+                <div>
+                    <h4 class="text-lg font-bold text-gray-800">背面法線方式 (Inverted Hull)</h4>
+                    <p class="text-sm text-gray-600 mt-2">
+                        キャラクターの輪郭線を描くための古典的かつ強力な手法。モデルを複製して少し膨らませ、面を裏返し（法線反転）、黒く塗りつぶします。
+                        これを元のモデルの背後に描画することで、カメラから見ると外周に均一な黒い線があるように見えます。
+                        <br><span class="text-xs text-gray-400 mt-1 block">メリット: 処理が軽い / デメリット: 線の入り抜き（強弱）が出にくい</span>
+                    </p>
+                </div>
+            </div>
+
+            <!-- Technique 4 -->
+            <div class="flex gap-4">
+                <div
+                    class="flex-shrink-0 w-12 h-12 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center font-bold">
+                    04</div>
+                <div>
+                    <h4 class="text-lg font-bold text-gray-800">嘘パース (Deformation)</h4>
+                    <p class="text-sm text-gray-600 mt-2">
+                        3Dのカメラは正確な遠近法しか描けませんが、アニメの迫力ある構図（パンチの瞬間に拳が巨大化するなど）はパースを無視します。
+                        これを再現するため、カメラに映る頂点座標をボーン（骨格）で無理やり歪ませるリグ（仕組み）を組み込みます。
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pipeline / Workflow -->
+    <section id="pipeline" class="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <div class="bg-gray-800 rounded-3xl p-8 md:p-12 text-white shadow-xl">
+            <h3 class="text-2xl font-bold mb-6">制作フローの変革：3Dから2Dへ</h3>
+            <p class="text-gray-400 mb-8">違和感を消すための工程は、モデリング段階からコンポジット（撮影）まで一貫して行われます。</p>
+
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div class="bg-gray-700 p-4 rounded-lg relative">
+                    <div
+                        class="absolute -top-3 -right-3 w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center font-bold text-sm">
+                        1</div>
+                    <h4 class="font-bold text-blue-300 mb-2">モデリング</h4>
+                    <p class="text-xs text-gray-300">法線編集を前提としたトポロジー（ポリゴンの並び）を作成。影が汚くなる凹凸を作らない。</p>
+                </div>
+                <div class="hidden md:block self-center text-center text-gray-500 text-2xl">→</div>
+
+                <div class="bg-gray-700 p-4 rounded-lg relative">
+                    <div
+                        class="absolute -top-3 -right-3 w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center font-bold text-sm">
+                        2</div>
+                    <h4 class="font-bold text-blue-300 mb-2">セットアップ</h4>
+                    <p class="text-xs text-gray-300">リミテッドアニメ用のリグ構築。可動域よりも「シルエットの美しさ」を優先した骨格設定。</p>
+                </div>
+                <div class="hidden md:block self-center text-center text-gray-500 text-2xl">→</div>
+
+                <div class="bg-gray-700 p-4 rounded-lg relative">
+                    <div
+                        class="absolute -top-3 -right-3 w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center font-bold text-sm">
+                        3</div>
+                    <h4 class="font-bold text-blue-300 mb-2">アニメーション</h4>
+                    <p class="text-xs text-gray-300">タメツメの意識。グラフエディタをステップ補間に変更し、ポーズのキメを作る。</p>
+                </div>
+            </div>
+
+            <div class="mt-8 pt-8 border-t border-gray-600 text-center">
+                <h4 class="font-bold text-lg mb-2">そして「撮影（コンポジット）」へ</h4>
+                <p class="text-sm text-gray-400 max-w-2xl mx-auto">
+                    最終的な「画作り」はAfter Effectsなどのコンポジットツールで行われます。
+                    3Dが出力した素材に、手描きのブラシタッチや、アニメ特有のレンズフレア（パラ漏れなど）を加えることで、
+                    デジタルの冷たさを完全に払拭します。
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <footer class="bg-white border-t border-gray-200 mt-12 py-8">
+        <div class="max-w-7xl mx-auto px-4 text-center text-gray-500 text-sm">
+            <p>© 2023 Anime CG Research Report. Generated for Analysis.</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // --- 1. Radar Chart: The Uncanny Gap ---
+        const ctxRadar = document.getElementById('gapRadarChart').getContext('2d');
+        const gapRadarChart = new Chart(ctxRadar, {
+            type: 'radar',
+            data: {
+                labels: ['動きのメリハリ (Timing)', '影の制御 (Shading)', '線の抑揚 (Line)', 'パースの嘘 (Persp)', '表情の記号化 (Face)'],
+                datasets: [{
+                    label: 'Raw 3D Output',
+                    data: [20, 30, 10, 10, 40],
+                    fill: true,
+                    backgroundColor: 'rgba(239, 68, 68, 0.2)',
+                    borderColor: 'rgb(239, 68, 68)',
+                    pointBackgroundColor: 'rgb(239, 68, 68)',
+                    pointBorderColor: '#fff',
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: 'rgb(239, 68, 68)'
+                }, {
+                    label: 'Ideal Anime Look',
+                    data: [90, 95, 85, 80, 100],
+                    fill: true,
+                    backgroundColor: 'rgba(59, 130, 246, 0.2)',
+                    borderColor: 'rgb(59, 130, 246)',
+                    pointBackgroundColor: 'rgb(59, 130, 246)',
+                    pointBorderColor: '#fff',
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: 'rgb(59, 130, 246)'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    r: {
+                        angleLines: { color: '#e5e7eb' },
+                        grid: { color: '#e5e7eb' },
+                        pointLabels: {
+                            font: { size: 11, family: "'Noto Sans JP', sans-serif" },
+                            color: '#4b5563'
+                        },
+                        suggestedMin: 0,
+                        suggestedMax: 100
+                    }
+                },
+                plugins: {
+                    legend: { position: 'bottom' }
+                }
+            }
+        });
+
+        // --- 2. FPS Adoption Chart ---
+        const ctxBar = document.getElementById('fpsAdoptionChart').getContext('2d');
+        const fpsAdoptionChart = new Chart(ctxBar, {
+            type: 'bar',
+            data: {
+                labels: ['日常系アニメ', 'アクション/メカ', 'ゲーム(リアルタイム)'],
+                datasets: [
+                    {
+                        label: 'リミテッド (8-24fps)',
+                        data: [95, 60, 20],
+                        backgroundColor: '#3b82f6',
+                    },
+                    {
+                        label: 'フルコマ (60fps)',
+                        data: [5, 40, 80],
+                        backgroundColor: '#ef4444',
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                indexAxis: 'y',
+                scales: {
+                    x: { stacked: true, max: 100 },
+                    y: { stacked: true }
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function (context) {
+                                return context.dataset.label + ': ' + context.raw + '%';
+                            }
+                        }
+                    },
+                    legend: { position: 'bottom', labels: { boxWidth: 10 } }
+                }
+            }
+        });
+
+        // --- 3. Animation Simulator Logic ---
+        const ball = document.getElementById('bouncing-ball');
+        const slider = document.getElementById('fps-slider');
+        const fpsLabel = document.getElementById('fps-label');
+        const descDiv = document.getElementById('fps-description');
+
+        let animationId;
+        let position = 0;
+        let direction = 1;
+        let speed = 2; // base speed
+        let lastTime = 0;
+
+        // Simulation variables
+        const fpsSettings = {
+            3: { fps: 60, label: "60 FPS (Raw 3D)", text: "滑らかすぎて「人形っぽい」動きです。重量感が感じられにくい状態です。", color: "text-red-600", bg: "bg-red-50", border: "border-red-500" },
+            2: { fps: 24, label: "24 FPS (TV Anime)", text: "標準的なTVアニメのレート。滑らかさとメリハリのバランスが良い状態です。", color: "text-blue-600", bg: "bg-blue-50", border: "border-blue-500" },
+            1: { fps: 12, label: "12 FPS (Limited)", text: "コマ落ち感がありますが、ポーズが強調され、アクションシーンなどで迫力が出ます。", color: "text-purple-600", bg: "bg-purple-50", border: "border-purple-500" }
+        };
+
+        // Custom Animation Loop to simulate specific FPS
+        function animate(currentTime) {
+            const val = parseInt(slider.value);
+            const targetFPS = fpsSettings[val].fps;
+            const interval = 1000 / targetFPS;
+
+            if (currentTime - lastTime > interval) {
+                lastTime = currentTime;
+
+                // Update position
+                position += speed * direction;
+                const trackWidth = document.getElementById('anim-track').clientWidth - 40; // -ball width
+
+                if (position > trackWidth) {
+                    position = trackWidth;
+                    direction = -1;
+                } else if (position < 0) {
+                    position = 0;
+                    direction = 1;
+                }
+
+                ball.style.left = position + 'px';
+            }
+            animationId = requestAnimationFrame(animate);
+        }
+
+        // Start animation
+        requestAnimationFrame(animate);
+
+        // Slider Event
+        slider.addEventListener('input', (e) => {
+            const val = e.target.value;
+            const setting = fpsSettings[val];
+
+            fpsLabel.textContent = setting.label;
+            fpsLabel.className = setting.color;
+
+            descDiv.textContent = setting.text;
+            descDiv.className = `${setting.bg} p-4 rounded-lg text-sm ${setting.color.replace('text', 'text')} border-l-4 ${setting.border}`;
+        });
+
+        // --- 4. Normal Editing Visualizer Logic ---
+        const shadowVisual = document.getElementById('shadow-visual');
+        const shadowCaption = document.getElementById('shadow-caption');
+        const normalDetailBox = document.getElementById('normal-detail-box');
+        const normalTitle = normalDetailBox.querySelector('h4');
+        const normalDesc = normalDetailBox.querySelector('p');
+
+        const normalData = {
+            'raw': {
+                title: '選択中の技術: 物理的に正しい法線',
+                desc: 'モデルの凹凸に正直に反応して影が落ちます。鼻の横や口元に意図しない影ができやすく、特に女性キャラや子供キャラでは「可愛くない」原因になります。',
+                caption: '複雑でガタついた境界',
+                gradient: 'radial-gradient(circle at 30% 30%, #555, #000)', // Simulate complex/dark shading
+                boxColor: 'bg-red-900',
+                titleColor: 'text-red-300'
+            },
+            'adjusted': {
+                title: '選択中の技術: 編集された法線 (球転写)',
+                desc: '「ギルティギア」シリーズや「宝石の国」などで有名になった手法。顔の法線情報をシンプルな球体の法線情報で上書き（転写）します。どの角度から見ても影が滑らかになります。',
+                caption: '滑らかで単純な境界',
+                gradient: 'linear-gradient(135deg, #ffffff 0%, #3b82f6 50%, #1e3a8a 100%)', // Smooth anime gradient
+                boxColor: 'bg-slate-800',
+                titleColor: 'text-blue-300'
+            },
+            'flat': {
+                title: '選択中の技術: 完全な嘘 (記号的影)',
+                desc: '光源計算を放棄し、テクスチャに直接影を描き込んだり、シェーダーで強制的に「顔の半分は常に明るい」と定義する手法。角度を変えると破綻しやすいですが、決めカットでは最強です。',
+                caption: '完全に二極化した境界',
+                gradient: 'linear-gradient(90deg, #ffffff 50%, #000000 50%)', // Hard cut
+                boxColor: 'bg-green-900',
+                titleColor: 'text-green-300'
+            }
+        };
+
+        function updateNormalInfo(key) {
+            const data = normalData[key];
+
+            // Update Text
+            normalTitle.textContent = data.title;
+            normalTitle.className = `text-lg font-bold ${data.titleColor} mb-2`;
+            normalDesc.textContent = data.desc;
+            shadowCaption.textContent = data.caption;
+
+            // Update Visuals
+            shadowVisual.style.background = data.gradient;
+            normalDetailBox.className = `mt-8 ${data.boxColor} text-white p-6 rounded-xl shadow-inner transition-all duration-300`;
+        }
+
+        // Initialize with default view (Adjusted)
+        updateNormalInfo('adjusted');
+
+    </script>
+</body>
+
+</html>
