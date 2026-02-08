@@ -6,15 +6,73 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>アニメCGの「違和感」を消す技術レポート</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            blue: '#3182ce',
+                            dark: '#0f172a'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&display=swap"
         rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
+        :root {
+            --bg-color: #fdfbf7;
+            --text-color: #2d3748;
+            --card-bg: rgba(255, 255, 255, 0.8);
+            --border-color: #e2e8f0;
+            --accent-blue: #3182ce;
+        }
+
+        .dark {
+            --bg-color: #0f172a;
+            --text-color: #f1f5f9;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --border-color: #334155;
+            --accent-blue: #60a5fa;
+        }
+
         body {
             font-family: 'Noto Sans JP', sans-serif;
-            background-color: #fdfbf7;
-            /* Warm paper-like background */
-            color: #2d3748;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background-color 0.5s ease;
+            overflow-x: hidden;
+        }
+
+        .glass {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--border-color);
+        }
+
+        /* Circular Reveal Overlay */
+        #theme-reveal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 9999;
+            clip-path: circle(0% at calc(100% - 2rem) 2rem);
+            transition: clip-path 0.8s cubic-bezier(0.65, 0, 0.35, 1);
+            background: var(--bg-color);
+        }
+
+        #theme-reveal.active {
+            clip-path: circle(150% at calc(100% - 2rem) 2rem);
         }
 
         .chart-container {
@@ -110,27 +168,41 @@
 
 <body class="antialiased">
 
+    <!-- Theme Reveal Overlay -->
+    <div id="theme-reveal"></div>
+
     <!-- Navigation / Header -->
-    <header class="bg-white shadow-sm sticky top-0 z-50">
+    <header
+        class="bg-white/90 dark:bg-slate-900/90 backdrop-blur-md shadow-sm sticky top-0 z-50 border-b border-gray-200/50 dark:border-slate-800/50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-            <h1 class="text-xl font-bold text-gray-800 tracking-tight">CG×Anime <span class="text-blue-600">Technique
-                    Lab</span></h1>
-            <nav class="hidden md:flex space-x-6 text-sm font-medium text-gray-500">
-                <a href="#intro" class="hover:text-blue-600 transition">課題 (The Challenge)</a>
-                <a href="#motion" class="hover:text-blue-600 transition">動き (Motion)</a>
-                <a href="#shading" class="hover:text-blue-600 transition">見た目 (Look)</a>
-                <a href="#pipeline" class="hover:text-blue-600 transition">工程 (Pipeline)</a>
-            </nav>
+            <h1 class="text-xl font-bold text-gray-800 dark:text-white tracking-tight flex items-center gap-2">
+                <i data-lucide="zap" class="text-blue-600 w-6 h-6"></i>
+                CG×Anime <span class="text-blue-600 dark:text-blue-400">Technique Lab</span>
+            </h1>
+            <div class="flex items-center gap-6">
+                <nav class="hidden md:flex space-x-6 text-sm font-medium text-gray-500 dark:text-gray-400">
+                    <a href="#intro" class="hover:text-blue-600 dark:hover:text-blue-400 transition">課題</a>
+                    <a href="#motion" class="hover:text-blue-600 dark:hover:text-blue-400 transition">動き</a>
+                    <a href="#shading" class="hover:text-blue-600 dark:hover:text-blue-400 transition">見た目</a>
+                    <a href="#pipeline" class="hover:text-blue-600 dark:hover:text-blue-400 transition">工程</a>
+                </nav>
+                <button id="theme-toggle"
+                    class="p-2 rounded-full bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-yellow-400 hover:scale-110 transition-transform shadow-inner border border-gray-200 dark:border-slate-700"
+                    aria-label="Toggle theme">
+                    <i data-lucide="sun" id="sun-icon"></i>
+                    <i data-lucide="moon" id="moon-icon" class="hidden"></i>
+                </button>
+            </div>
         </div>
     </header>
 
     <!-- Hero Section -->
     <section id="intro" class="pt-12 pb-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <div class="text-center mb-10">
-            <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4">
+            <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900 dark:text-white mb-4">
                 なぜ、その3DCGは<br class="md:hidden" />「ヌルヌル」して見えるのか？
             </h2>
-            <p class="text-lg text-gray-600 max-w-3xl mx-auto leading-relaxed">
+            <p class="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto leading-relaxed">
                 現代のアニメ制作において3DCGは不可欠です。しかし、物理的に正しい3D計算は、
                 日本のアニメが培ってきた「省略の美学」と衝突し、視聴者に強い違和感（不気味の谷）を与えます。
                 本レポートでは、この違和感を解消し、3Dで「手描き」のニュアンスを再現するための主要技術を解説します。
@@ -138,26 +210,27 @@
         </div>
 
         <!-- Metric: The Gap Visualized -->
-        <div class="bg-white rounded-xl shadow-lg p-6 md:p-8 border border-gray-100">
+        <div class="glass rounded-2xl shadow-xl p-6 md:p-8 border border-white/20 dark:border-slate-700/50 mt-8">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
                 <div>
-                    <h3 class="text-xl font-bold text-gray-800 mb-2">違和感の正体：リアリズム vs アニメ的表現</h3>
-                    <p class="text-gray-600 text-sm mb-4">
+                    <h3 class="text-xl font-bold text-gray-800 dark:text-gray-100 mb-2 whitespace-nowrap">違和感の正体：リアリズム
+                        vs アニメ的表現</h3>
+                    <p class="text-gray-600 dark:text-gray-400 text-sm mb-4 leading-relaxed">
                         物理シミュレーションによる「正確すぎる動き」や「滑らかすぎる陰影」が、アニメ的な記号論と乖離することで違和感が生まれます。
                         右のチャートは、Raw（未調整）の3D出力と、目指すべきアニメルックのギャップを示しています。
                     </p>
-                    <ul class="space-y-2 text-sm text-gray-600">
+                    <ul class="space-y-2 text-sm text-gray-600 dark:text-gray-400">
                         <li class="flex items-center">
                             <span class="w-3 h-3 bg-red-400 rounded-full mr-2"></span>
-                            Raw 3D: 正確だが情報過多、均一な動き
+                            調整なしの3D出力: 正確だが情報過多、均一な動き
                         </li>
                         <li class="flex items-center">
                             <span class="w-3 h-3 bg-blue-500 rounded-full mr-2"></span>
-                            Anime Style: 意図的な嘘、メリハリ、情報の整理
+                            理想のアニメルック: 意図的な嘘、メリハリ、情報の整理
                         </li>
                     </ul>
                 </div>
-                <div class="chart-container bg-gray-50 rounded-lg p-2">
+                <div class="chart-container bg-white/50 dark:bg-slate-800/50 rounded-lg p-2">
                     <canvas id="gapRadarChart"></canvas>
                 </div>
             </div>
@@ -165,13 +238,14 @@
     </section>
 
     <!-- Core Interactive Section: Motion & Timing -->
-    <section id="motion" class="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto bg-gray-50 rounded-3xl my-8">
+    <section id="motion"
+        class="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto dark:bg-slate-900/50 bg-gray-50 rounded-3xl my-8">
         <div class="mb-8">
-            <h3 class="text-2xl font-bold text-gray-900 flex items-center">
+            <h3 class="text-2xl font-bold text-gray-900 dark:text-white flex items-center">
                 <span class="bg-blue-600 text-white p-2 rounded-lg text-sm mr-3">技術 01</span>
                 コマ打ち (Limited Animation)
             </h3>
-            <p class="mt-2 text-gray-600">
+            <p class="mt-2 text-gray-600 dark:text-gray-300">
                 3DCGのデフォルトは60fps（毎秒60フレーム）の滑らかな動きですが、リミテッドアニメ（日本の商業アニメ）は通常8〜24fps（3コマ打ち、2コマ打ち）で描かれます。
                 フレームレートを意図的に下げることで、力強さとリズムを生み出します。
             </p>
@@ -179,8 +253,9 @@
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
             <!-- Simulator -->
-            <div class="bg-white p-6 rounded-xl shadow-md border border-gray-200">
-                <h4 class="font-bold text-gray-800 mb-4 text-center">フレームレート体感シミュレーター</h4>
+            <div
+                class="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-md border border-gray-200 dark:border-slate-800 glass">
+                <h4 class="font-bold text-gray-800 dark:text-gray-100 mb-4 text-center">フレームレート体感シミュレーター</h4>
 
                 <div id="anim-track" class="mb-6 relative">
                     <!-- Grid lines for visual reference -->
@@ -203,12 +278,12 @@
                 <div class="space-y-6">
                     <div>
                         <div class="flex justify-between mb-2">
-                            <span class="text-sm font-semibold text-gray-700">FPS設定: <span id="fps-label"
-                                    class="text-blue-600">60 FPS (Raw 3D)</span></span>
+                            <span class="text-sm font-semibold text-gray-700 dark:text-gray-200">FPS設定: <span
+                                    id="fps-label" class="text-blue-600">60 FPS (Raw 3D)</span></span>
                         </div>
                         <input type="range" id="fps-slider" min="1" max="3" step="1" value="3"
                             class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
-                        <div class="flex justify-between text-xs text-gray-500 mt-1">
+                        <div class="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
                             <span>低 (8-12fps)</span>
                             <span>中 (24fps)</span>
                             <span>高 (60fps)</span>
@@ -224,22 +299,22 @@
 
             <!-- Stats/Context -->
             <div>
-                <h4 class="font-bold text-gray-800 mb-4">手法による印象の違い</h4>
+                <h4 class="font-bold text-gray-800 dark:text-gray-100 mb-4">手法による印象の違い</h4>
                 <div class="space-y-4">
-                    <div class="bg-white p-4 rounded-lg shadow-sm border-l-4 border-red-400">
-                        <h5 class="font-bold text-gray-900">フルコマ (Full Animation)</h5>
-                        <p class="text-sm text-gray-600 mt-1">
+                    <div class="bg-white dark:bg-slate-800 p-4 rounded-lg shadow-sm border-l-4 border-red-400 glass">
+                        <h5 class="font-bold text-gray-900 dark:text-white">フルコマ (Full Animation)</h5>
+                        <p class="text-sm text-gray-600 dark:text-gray-300 mt-1">
                             1秒間に24枚以上の絵を使う。ディズニーやピクサーの手法。滑らかだが、日本のアニメ文脈では「CG臭さ」の原因になりやすい。</p>
                     </div>
-                    <div class="bg-white p-4 rounded-lg shadow-sm border-l-4 border-blue-500">
-                        <h5 class="font-bold text-gray-900">リミテッド (Limited Animation)</h5>
-                        <p class="text-sm text-gray-600 mt-1">
+                    <div class="bg-white dark:bg-slate-800 p-4 rounded-lg shadow-sm border-l-4 border-blue-500 glass">
+                        <h5 class="font-bold text-gray-900 dark:text-white">リミテッド (Limited Animation)</h5>
+                        <p class="text-sm text-gray-600 dark:text-gray-300 mt-1">
                             「タメ」と「ツメ」を強調するためにコマを抜く。重要なポーズ（キーフレーム）を長く見せ、中割りを減らすことでメリハリをつける。</p>
                     </div>
                 </div>
 
                 <div class="mt-6">
-                    <h4 class="font-bold text-gray-800 mb-2 text-sm">採用率の推移 (推計)</h4>
+                    <h4 class="font-bold text-gray-800 dark:text-gray-100 mb-2 text-sm">採用率の推移 (推計)</h4>
                     <div class="chart-container" style="height: 200px;">
                         <canvas id="fpsAdoptionChart"></canvas>
                     </div>
@@ -251,11 +326,11 @@
     <!-- Core Interactive Section: Shading & Geometry -->
     <section id="shading" class="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <div class="mb-10">
-            <h3 class="text-2xl font-bold text-gray-900 flex items-center">
+            <h3 class="text-2xl font-bold text-gray-900 dark:text-white flex items-center">
                 <span class="bg-blue-600 text-white p-2 rounded-lg text-sm mr-3">技術 02</span>
                 法線編集と影の制御 (Normal Editing)
             </h3>
-            <p class="mt-2 text-gray-600 max-w-4xl">
+            <p class="mt-2 text-gray-600 dark:text-gray-400 max-w-4xl">
                 3Dモデルの表面にある「法線（Normal）」は、光の反射方向を決定します。
                 人体の正しい法線をそのまま使うと、頬や鼻にリアルすぎて汚い影が落ちてしまいます。
                 アニメ調にするには、法線を「球体」や「平面」に近似させて、意図的に影をコントロールします。
@@ -265,37 +340,38 @@
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <!-- Concept Visualizer 1: Raw Normals -->
             <div id="card-raw"
-                class="interactive-card bg-white p-6 rounded-xl border border-gray-200 text-center group cursor-pointer"
+                class="interactive-card bg-white dark:bg-slate-900 p-6 rounded-xl border border-gray-200 dark:border-slate-800 text-center group cursor-pointer glass"
                 onclick="updateNormalInfo('raw')">
                 <div
-                    class="w-16 h-16 bg-gray-100 rounded-full mx-auto mb-4 flex items-center justify-center text-2xl group-hover:bg-red-100 transition">
-                    🤖
+                    class="w-16 h-16 bg-gray-100 dark:bg-slate-800 rounded-full mx-auto mb-4 flex items-center justify-center text-blue-600 transition group-hover:bg-red-100 dark:group-hover:bg-red-900/30">
+                    <i data-lucide="bot" class="w-8 h-8"></i>
                 </div>
-                <h4 class="font-bold text-gray-800">物理的に正しい法線</h4>
+                <h4 class="font-bold text-gray-800 dark:text-gray-100">物理的に正しい法線</h4>
                 <p class="text-xs text-gray-500 mt-2">形状を忠実に反映。シワや微細な凹凸まで影として描画されるため、キャラクターが老けた印象に見えてしまうことがある。</p>
             </div>
 
             <!-- Concept Visualizer 2: Adjusted Normals -->
             <div id="card-adjusted"
-                class="interactive-card bg-white p-6 rounded-xl border-2 border-blue-500 text-center group cursor-pointer shadow-md"
+                class="interactive-card bg-white dark:bg-slate-900 p-6 rounded-xl border border-gray-200 dark:border-slate-800 text-center group cursor-pointer glass"
                 onclick="updateNormalInfo('adjusted')">
                 <div
-                    class="w-16 h-16 bg-blue-100 rounded-full mx-auto mb-4 flex items-center justify-center text-2xl group-hover:scale-110 transition">
-                    ✨
+                    class="w-16 h-16 bg-gray-100 dark:bg-slate-800 rounded-full mx-auto mb-4 flex items-center justify-center text-blue-600 transition group-hover:bg-blue-100 dark:group-hover:bg-blue-900/30">
+                    <i data-lucide="sparkles" class="w-8 h-8"></i>
                 </div>
-                <h4 class="font-bold text-blue-700">編集された法線 (球転写)</h4>
-                <p class="text-xs text-gray-500 mt-2">顔の法線を簡易な「球」や「円柱」から転写。光の当たり方が単純化され、アニメ特有の綺麗なグラデーションになる。</p>
+                <h4 class="font-bold text-gray-800 dark:text-gray-100">編集された法線 (球転写)</h4>
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                    顔の法線を簡易な「球」や「円柱」から転写。光の当たり方が単純化され、アニメ調の綺麗なグラデーションになる。</p>
             </div>
 
             <!-- Concept Visualizer 3: Flat/Symbolic -->
             <div id="card-flat"
-                class="interactive-card bg-white p-6 rounded-xl border border-gray-200 text-center group cursor-pointer"
+                class="interactive-card bg-white dark:bg-slate-900 p-6 rounded-xl border border-gray-200 dark:border-slate-800 text-center group cursor-pointer glass"
                 onclick="updateNormalInfo('flat')">
                 <div
-                    class="w-16 h-16 bg-gray-100 rounded-full mx-auto mb-4 flex items-center justify-center text-2xl group-hover:bg-green-100 transition">
-                    🎨
+                    class="w-16 h-16 bg-gray-100 dark:bg-slate-800 rounded-full mx-auto mb-4 flex items-center justify-center text-blue-600 group-hover:bg-green-100 dark:group-hover:bg-green-900/30 transition">
+                    <i data-lucide="palette" class="w-8 h-8"></i>
                 </div>
-                <h4 class="font-bold text-gray-800">完全な嘘 (記号的影)</h4>
+                <h4 class="font-bold text-gray-800 dark:text-gray-100">完全な嘘 (記号的影)</h4>
                 <p class="text-xs text-gray-500 mt-2">テクスチャに直接影を描き込む、あるいは光源位置を無視して「見栄えが良い位置」に影を固定する手法。</p>
             </div>
         </div>
@@ -325,8 +401,9 @@
     </section>
 
     <!-- Additional Techniques List (Outline & Deformation) -->
-    <section class="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto bg-white border-t border-gray-100">
-        <h3 class="text-2xl font-bold text-gray-900 mb-8">その他の重要アプローチ</h3>
+    <section
+        class="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto dark:bg-slate-900 bg-white border-t border-gray-100 dark:border-slate-800 transition-colors duration-500">
+        <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-8">その他の重要アプローチ</h3>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
             <!-- Technique 3 -->
             <div class="flex gap-4">
@@ -334,8 +411,8 @@
                     class="flex-shrink-0 w-12 h-12 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center font-bold">
                     03</div>
                 <div>
-                    <h4 class="text-lg font-bold text-gray-800">背面法線方式 (Inverted Hull)</h4>
-                    <p class="text-sm text-gray-600 mt-2">
+                    <h4 class="text-lg font-bold text-gray-800 dark:text-gray-100">背面法線方式 (Inverted Hull)</h4>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 mt-2">
                         キャラクターの輪郭線を描くための古典的かつ強力な手法。モデルを複製して少し膨らませ、面を裏返し（法線反転）、黒く塗りつぶします。
                         これを元のモデルの背後に描画することで、カメラから見ると外周に均一な黒い線があるように見えます。
                         <br><span class="text-xs text-gray-400 mt-1 block">メリット: 処理が軽い / デメリット: 線の入り抜き（強弱）が出にくい</span>
@@ -349,8 +426,8 @@
                     class="flex-shrink-0 w-12 h-12 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center font-bold">
                     04</div>
                 <div>
-                    <h4 class="text-lg font-bold text-gray-800">嘘パース (Deformation)</h4>
-                    <p class="text-sm text-gray-600 mt-2">
+                    <h4 class="text-lg font-bold text-gray-800 dark:text-gray-100">嘘パース (Deformation)</h4>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 mt-2">
                         3Dのカメラは正確な遠近法しか描けませんが、アニメの迫力ある構図（パンチの瞬間に拳が巨大化するなど）はパースを無視します。
                         これを再現するため、カメラに映る頂点座標をボーン（骨格）で意図的に歪ませるリグ（仕組み）を組み込みます。
                     </p>
@@ -361,12 +438,12 @@
 
     <!-- Deep Dive: Professional Workflow Techniques -->
     <section id="advanced-techniques"
-        class="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto bg-gray-50 my-12 rounded-3xl border border-gray-200">
+        class="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto bg-gray-50 dark:bg-slate-900/50 my-12 rounded-3xl border border-gray-200 dark:border-slate-800 transition-colors duration-500">
         <div class="text-center mb-10">
-            <h3 class="text-3xl font-extrabold text-gray-900">
+            <h3 class="text-3xl font-extrabold text-gray-900 dark:text-white">
                 プロフェッショナルの現場技術
             </h3>
-            <p class="mt-4 text-gray-600 max-w-2xl mx-auto">
+            <p class="mt-4 text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
                 「キャラクター（作画）」と「背景（美術）」では、求められるリアリティの質が異なります。
                 それぞれのワークフローで標準的に採用されている高度な技術を解説します。
             </p>
@@ -374,18 +451,19 @@
 
         <!-- Tabs Navigation -->
         <div class="flex justify-center mb-8">
-            <div class="bg-white p-1 rounded-xl shadow-sm border border-gray-200 inline-flex">
-                <button id="tab-char" onclick="switchTab('char')"
-                    class="px-6 py-3 rounded-lg text-sm font-bold transition-all duration-200 bg-blue-600 text-white shadow-md">
-                    🐱 キャラクター制作 (Character)
+            <div
+                class="bg-white dark:bg-slate-800 p-1 rounded-xl shadow-sm border border-gray-200 dark:border-slate-700 inline-flex glass">
+                <button id="tab-nav-char" onclick="switchTab('char')"
+                    class="px-6 py-3 rounded-lg text-sm font-bold transition-all duration-200 bg-blue-600 text-white shadow-md flex items-center gap-2">
+                    <i data-lucide="user" class="w-4 h-4"></i> キャラクター制作
                 </button>
-                <button id="tab-bg" onclick="switchTab('bg')"
-                    class="px-6 py-3 rounded-lg text-sm font-bold text-gray-500 hover:text-gray-700 hover:bg-gray-50 transition-all duration-200 ml-2">
-                    🏞️ 背景美術 (Background)
+                <button id="tab-nav-bg" onclick="switchTab('bg')"
+                    class="px-6 py-3 rounded-lg text-sm font-bold text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-slate-800 transition-all duration-200 ml-2 flex items-center gap-2">
+                    <i data-lucide="image" class="w-4 h-4"></i> 背景美術
                 </button>
-                <button id="tab-vfx" onclick="switchTab('vfx')"
-                    class="px-6 py-3 rounded-lg text-sm font-bold text-gray-500 hover:text-gray-700 hover:bg-gray-50 transition-all duration-200 ml-2">
-                    ⚡ 特殊効果と未来 (VFX)
+                <button id="tab-nav-vfx" onclick="switchTab('vfx')"
+                    class="px-6 py-3 rounded-lg text-sm font-bold text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-slate-800 transition-all duration-200 ml-2 flex items-center gap-2">
+                    <i data-lucide="zap" class="w-4 h-4"></i> 特殊効果
                 </button>
             </div>
         </div>
@@ -393,24 +471,28 @@
         <!-- Content Area: Character -->
         <div id="content-char" class="space-y-12 animate-fade-in block">
             <!-- 1. Shader & Material -->
-            <div class="bg-white rounded-2xl p-8 shadow-sm border-l-8 border-blue-500">
+            <div class="bg-white dark:bg-slate-900 rounded-2xl p-8 shadow-sm border-l-8 border-blue-500 glass">
                 <div class="flex items-start gap-4">
-                    <div class="bg-blue-100 p-3 rounded-lg text-2xl">🎨</div>
+                    <div class="bg-blue-100 dark:bg-blue-900/40 p-3 rounded-lg text-blue-600 dark:text-blue-400">
+                        <i data-lucide="palette"></i>
+                    </div>
                     <div>
-                        <h4 class="text-xl font-bold text-gray-900 mb-2">Shader & Material: 「愛される嘘」をつく</h4>
+                        <h4 class="text-xl font-bold text-gray-900 dark:text-white mb-2">Shader & Material: 「愛される嘘」をつく
+                        </h4>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-4">
                             <div>
-                                <h5 class="font-bold text-blue-700 mb-1">トゥーンシェーダー & グラデーションマップ</h5>
-                                <p class="text-sm text-gray-600 leading-relaxed">
+                                <h5 class="font-bold text-blue-700 dark:text-blue-400 mb-1">トゥーンシェーダー & グラデーションマップ</h5>
+                                <p class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
                                     3Dの滑らかな陰影を、アニメ塗りの「パキッとした境界」に変換します。
                                     さらに、影色を単に暗くするのではなく、「彩度の高い青紫色」などに置換するグラデーションマップ制御により、
                                     アニメ特有の鮮やかな色彩設計を再現します。
                                 </p>
                             </div>
                             <div>
-                                <h5 class="font-bold text-blue-700 mb-1">SDF (符号付き距離場) 顔影制御</h5>
-                                <p class="text-sm text-gray-600 leading-relaxed">
-                                    <span class="bg-blue-100 text-blue-800 text-xs px-2 py-0.5 rounded">業界標準</span>
+                                <h5 class="font-bold text-blue-700 dark:text-blue-400 mb-1">SDF (符号付き距離場) 顔影制御</h5>
+                                <p class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+                                    <span
+                                        class="bg-blue-100 dark:bg-blue-900/50 text-blue-800 dark:text-blue-300 text-xs px-2 py-0.5 rounded">業界標準</span>
                                     「原神」や「GUILTY GEAR」系で採用されている最先端技術。
                                     顔のどこに影が落ちるべきかを、ライトの角度ごとに計算した「理想の影形状」としてテクスチャに焼き付けておきます。
                                     これにより、鼻の形状モデルに関わらず、常に「作画崩壊しない美しい影」が表示されます。
@@ -422,29 +504,32 @@
             </div>
 
             <!-- 2. Camera & Rig -->
-            <div class="bg-white rounded-2xl p-8 shadow-sm border-l-8 border-blue-400">
+            <div class="bg-white dark:bg-slate-900 rounded-2xl p-8 shadow-sm border-l-8 border-blue-400 glass">
                 <div class="flex items-start gap-4">
-                    <div class="bg-blue-50 p-3 rounded-lg text-2xl">🎥</div>
+                    <div class="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg text-blue-500">
+                        <i data-lucide="video"></i>
+                    </div>
                     <div>
-                        <h4 class="text-xl font-bold text-gray-900 mb-2">Camera & Rig: シルエット優先の構造</h4>
+                        <h4 class="text-xl font-bold text-gray-900 dark:text-white mb-2">Camera & Rig: シルエット優先の構造</h4>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-4">
                             <div>
-                                <h5 class="font-bold text-gray-800 mb-1">嘘パース (Lie Perspective)</h5>
-                                <p class="text-sm text-gray-600 leading-relaxed">
+                                <h5 class="font-bold text-gray-800 dark:text-gray-200 mb-1">嘘パース (Lie Perspective)</h5>
+                                <p class="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
                                     決めポーズで手前にある手足を、ボーンスケール変更で物理的に巨大化させます。
                                     カメラのレンズ効果だけに頼らず、モデル自体を変形させることで、作画の「ハッタリ」の効いた構図を再現します。
                                 </p>
                             </div>
                             <div>
-                                <h5 class="font-bold text-gray-800 mb-1">望遠レンズ効果 (Telephoto)</h5>
-                                <p class="text-sm text-gray-600 leading-relaxed">
+                                <h5 class="font-bold text-gray-800 dark:text-gray-200 mb-1">望遠レンズ効果 (Telephoto)</h5>
+                                <p class="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
                                     キャラクターのアップショットでは、焦点距離80mm〜100mm以上の望遠レンズ設定を使用します。
                                     広角レンズ特有の「顔の歪み（魚眼効果）」を排除し、2Dの平面的で整った顔立ちを保つためです。
                                 </p>
                             </div>
-                            <div class="md:col-span-2 border-t border-gray-100 pt-4 mt-2">
-                                <h5 class="font-bold text-gray-800 mb-1">ブレンドシェイプ & リグ (BlendShape)</h5>
-                                <p class="text-sm text-gray-600 leading-relaxed">
+                            <div class="md:col-span-2 border-t border-gray-100 dark:border-slate-800 pt-4 mt-2">
+                                <h5 class="font-bold text-gray-800 dark:text-gray-200 mb-1">ブレンドシェイプ & リグ (BlendShape)
+                                </h5>
+                                <p class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
                                     <span class="bg-red-100 text-red-600 text-xs px-2 py-0.5 rounded mr-1">必須</span>
                                     ボーン（骨）の移動だけでは、アニメ特有の記号的な表情（「＞＜」目や四角い口）は作れません。
                                     これらは粘土のように頂点を変形させた「ブレンドシェイプ」で再現します。
@@ -457,21 +542,27 @@
             </div>
 
             <!-- 3. Composite -->
-            <div class="bg-white rounded-2xl p-8 shadow-sm border-l-8 border-indigo-500">
+            <div class="bg-white dark:bg-slate-900 rounded-2xl p-8 shadow-sm border-l-8 border-indigo-500 glass">
                 <div class="flex items-start gap-4">
-                    <div class="bg-indigo-100 p-3 rounded-lg text-2xl">✨</div>
+                    <div class="bg-indigo-100 dark:bg-indigo-900/30 p-3 rounded-lg text-indigo-600">
+                        <i data-lucide="sparkles"></i>
+                    </div>
                     <div>
-                        <h4 class="text-xl font-bold text-gray-900 mb-2">Composite (撮影): 馴染ませの魔法</h4>
+                        <h4 class="text-xl font-bold text-gray-900 dark:text-white mb-2">Composite (撮影): 馴染ませの魔法</h4>
                         <ul class="space-y-4 mt-4">
-                            <li class="flex flex-col md:flex-row gap-2 md:items-center border-b border-gray-100 pb-2">
-                                <span class="font-bold text-indigo-700 min-w-[140px]">色トレス (Color Trace)</span>
-                                <span class="text-sm text-gray-600">
+                            <li
+                                class="flex flex-col md:flex-row gap-2 md:items-center border-b border-gray-100 dark:border-slate-800 pb-2">
+                                <span class="font-bold text-indigo-700 dark:text-indigo-400 min-w-[140px]">色トレス (Color
+                                    Trace)</span>
+                                <span class="text-sm text-gray-600 dark:text-gray-400">
                                     キャラクターの輪郭線を「黒一色」にするのではなく、肌の周りは茶色、明るい服の周りはその服の濃い色、と馴染ませる処理。デジタルではPencil+などのライン抽出機能でエリアと色を制御します。
                                 </span>
                             </li>
-                            <li class="flex flex-col md:flex-row gap-2 md:items-center border-b border-gray-100 pb-2">
-                                <span class="font-bold text-indigo-700 min-w-[140px]">パラ漏れ (Para-flare)</span>
-                                <span class="text-sm text-gray-600">
+                            <li
+                                class="flex flex-col md:flex-row gap-2 md:items-center border-b border-gray-100 dark:border-slate-800 pb-2">
+                                <span class="font-bold text-indigo-700 dark:text-indigo-400 min-w-[140px]">パラ漏れ
+                                    (Para-flare)</span>
+                                <span class="text-sm text-gray-600 dark:text-gray-400">
                                     かつてのセル画撮影時に起きた、「透過光（ライト）」が隣のセル層に滲んでしまう現象。
                                     デジタルではあえてこの「滲み」をシミュレートし、画面に温かみと発光感を与えます。
                                 </span>
@@ -485,15 +576,17 @@
         <!-- Content Area: Background -->
         <div id="content-bg" class="space-y-12 animate-fade-in hidden">
             <!-- 1. Material & Shader -->
-            <div class="bg-white rounded-2xl p-8 shadow-sm border-l-8 border-green-500">
+            <div class="bg-white dark:bg-slate-900 rounded-2xl p-8 shadow-sm border-l-8 border-green-500 glass">
                 <div class="flex items-start gap-4">
-                    <div class="bg-green-100 p-3 rounded-lg text-2xl">🖌️</div>
+                    <div class="bg-green-100 dark:bg-green-900/30 p-3 rounded-lg text-green-600">
+                        <i data-lucide="brush"></i>
+                    </div>
                     <div>
-                        <h4 class="text-xl font-bold text-gray-900 mb-2">Material: 3Dをキャンバスにする</h4>
+                        <h4 class="text-xl font-bold text-gray-900 dark:text-white mb-2">Material: 3Dをキャンバスにする</h4>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-4">
                             <div>
                                 <h5 class="font-bold text-green-700 mb-1">カメラマッピング (Projection)</h5>
-                                <p class="text-sm text-gray-600 leading-relaxed">
+                                <p class="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
                                     <span class="bg-green-100 text-green-800 text-xs px-2 py-0.5 rounded">業界標準</span>
                                     熟練の美術スタッフが描いた一枚絵（美術ボード）を、簡易的な3Dジオメトリにプロジェクターのように投影して貼り付ける技術。
                                     「手描きの筆致」と「3Dの奥行き移動」を両立させる、劇場版アニメ等の背景制作の主流技術です。
@@ -501,7 +594,7 @@
                             </div>
                             <div>
                                 <h5 class="font-bold text-green-700 mb-1">水彩調フィルター (Kuwahara Filter)</h5>
-                                <p class="text-sm text-gray-600 leading-relaxed">
+                                <p class="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
                                     フル3Dで作成された背景の場合、そのままではシャープすぎます。
                                     「Kuwaharaフィルター」やポスタリゼーション処理をかけることで、ディテールを意図的に潰し、筆で描いたような色面（タッチ）を作り出します。
                                 </p>
@@ -512,12 +605,14 @@
             </div>
 
             <!-- 2. Camera & Layout -->
-            <div class="bg-white rounded-2xl p-8 shadow-sm border-l-8 border-green-600">
+            <div class="bg-white dark:bg-slate-900 rounded-2xl p-8 shadow-sm border-l-8 border-green-600 glass">
                 <div class="flex items-start gap-4">
-                    <div class="bg-green-50 p-3 rounded-lg text-2xl">📐</div>
+                    <div class="bg-green-50 dark:bg-green-900/20 p-3 rounded-lg text-green-500">
+                        <i data-lucide="ruler"></i>
+                    </div>
                     <div>
-                        <h4 class="text-xl font-bold text-gray-900 mb-2">3D Layout: 設計図としての3D</h4>
-                        <p class="text-sm text-gray-600 mt-2 mb-4">
+                        <h4 class="text-xl font-bold text-gray-900 dark:text-white mb-2">3D Layout: 設計図としての3D</h4>
+                        <p class="text-sm text-gray-600 dark:text-gray-300 mt-2 mb-4">
                             「レイアウト（画面構成）」工程で3Dを使用し、監督の意図する画角、レンズ、被写界深度を厳密に決定します。
                             MAPPAやOLMなどのスタジオでは、この3Dレイアウトを原画マンに渡し、それをなぞる（ガイドにする）ことで、
                             複雑なパース背景とキャラクターの正確な整合性を担保しています。
@@ -527,22 +622,28 @@
             </div>
 
             <!-- 3. Composite -->
-            <div class="bg-white rounded-2xl p-8 shadow-sm border-l-8 border-orange-500">
+            <div class="bg-white dark:bg-slate-900 rounded-2xl p-8 shadow-sm border-l-8 border-orange-500 glass">
                 <div class="flex items-start gap-4">
-                    <div class="bg-orange-100 p-3 rounded-lg text-2xl">⛅</div>
+                    <div class="bg-orange-100 dark:bg-orange-900/30 p-3 rounded-lg text-orange-600">
+                        <i data-lucide="cloud-sun"></i>
+                    </div>
                     <div>
-                        <h4 class="text-xl font-bold text-gray-900 mb-2">Composite (撮影): 空気の演出</h4>
+                        <h4 class="text-xl font-bold text-gray-900 dark:text-white mb-2">Composite (撮影): 空気の演出</h4>
                         <ul class="space-y-4 mt-4">
-                            <li class="flex flex-col md:flex-row gap-2 md:items-center border-b border-gray-100 pb-2">
-                                <span class="font-bold text-orange-700 min-w-[140px]">空気遠近 (Aerial Persp)</span>
-                                <span class="text-sm text-gray-600">
+                            <li
+                                class="flex flex-col md:flex-row gap-2 md:items-center border-b border-gray-100 dark:border-slate-800 pb-2">
+                                <span class="font-bold text-orange-700 dark:text-orange-400 min-w-[140px]">空気遠近 (Aerial
+                                    Persp)</span>
+                                <span class="text-sm text-gray-600 dark:text-gray-400">
                                     カメラからの距離（Z深度）に応じて、奥にある物体ほど「青白く（フォグ）」霞ませる処理。
                                     3Dパスから深度情報（Z-Depth）を書き出し、After Effectsで合成することで、巨大なスケール感を表現します。
                                 </span>
                             </li>
-                            <li class="flex flex-col md:flex-row gap-2 md:items-center border-b border-gray-100 pb-2">
-                                <span class="font-bold text-orange-700 min-w-[140px]">入射光 (God Rays)</span>
-                                <span class="text-sm text-gray-600">
+                            <li
+                                class="flex flex-col md:flex-row gap-2 md:items-center border-b border-gray-100 dark:border-slate-800 pb-2">
+                                <span class="font-bold text-orange-700 dark:text-orange-400 min-w-[140px]">入射光 (God
+                                    Rays)</span>
+                                <span class="text-sm text-gray-600 dark:text-gray-400">
                                     窓からの光や木漏れ日を、ただ明るくするだけでなく「光の筋」として可視化するチンダル現象の表現。
                                     画面の密度を上げ、ドラマチックな空間を演出する必須テクニックです。
                                 </span>
@@ -556,12 +657,14 @@
         <!-- Content Area: VFX & Future -->
         <div id="content-vfx" class="space-y-12 animate-fade-in hidden">
             <!-- 1. Particle Simulator -->
-            <div class="bg-white rounded-2xl p-8 shadow-sm border-l-8 border-purple-500">
+            <div class="bg-white dark:bg-slate-900 rounded-2xl p-8 shadow-sm border-l-8 border-purple-500 glass">
                 <div class="flex items-start gap-4 mb-6">
-                    <div class="bg-purple-100 p-3 rounded-lg text-2xl">🪄</div>
+                    <div class="bg-purple-100 dark:bg-purple-900/30 p-3 rounded-lg text-purple-600">
+                        <i data-lucide="wand-2"></i>
+                    </div>
                     <div>
-                        <h4 class="text-xl font-bold text-gray-900 mb-2">VFX: 嘘の爆発、嘘の煙</h4>
-                        <p class="text-sm text-gray-600">
+                        <h4 class="text-xl font-bold text-gray-900 dark:text-white mb-2">VFX: 嘘の爆発、嘘の煙</h4>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">
                             リアルな流体シミュレーションは、アニメの世界では「情報量が多すぎて」浮いてしまいます。
                             HoudiniやEffekseerなどのツールを使っても、あえて「コマを抜く」「色を単純化する」ことでアニメに馴染ませます。
                         </p>
@@ -585,23 +688,27 @@
             </div>
 
             <!-- 2. Production Revolution -->
-            <div class="bg-white rounded-2xl p-8 shadow-sm border-l-8 border-indigo-600">
+            <div class="bg-white dark:bg-slate-900 rounded-2xl p-8 shadow-sm border-l-8 border-indigo-600 glass">
                 <div class="flex items-start gap-4">
-                    <div class="bg-indigo-100 p-3 rounded-lg text-2xl">🎮</div>
+                    <div class="bg-indigo-100 dark:bg-indigo-900/30 p-3 rounded-lg text-indigo-600">
+                        <i data-lucide="gamepad-2"></i>
+                    </div>
                     <div>
-                        <h4 class="text-xl font-bold text-gray-900 mb-2">制作環境の革命 (Real-time & Mocap)</h4>
+                        <h4 class="text-xl font-bold text-gray-900 dark:text-white mb-2">制作環境の革命 (Real-time & Mocap)
+                        </h4>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-4">
                             <div>
                                 <h5 class="font-bold text-indigo-700 mb-1">リアルタイムエンジン (UE5 / Unity)</h5>
-                                <p class="text-sm text-gray-600 leading-relaxed">
-                                    <span class="bg-indigo-100 text-indigo-800 text-xs px-2 py-0.5 rounded">トレンド</span>
+                                <p class="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
+                                    <span
+                                        class="bg-indigo-100 dark:bg-indigo-900/30 text-indigo-800 dark:text-indigo-200 text-xs px-2 py-0.5 rounded">トレンド</span>
                                     従来の数時間かかるレンダリング（映像書き出し）を、ゲームエンジンを使って「リアルタイム」に行う手法。
                                     「ガールズバンドクライ」等で採用され、ライティングやカメラワークをその場で試行錯誤できるため、クオリティが劇的に向上します。
                                 </p>
                             </div>
                             <div>
                                 <h5 class="font-bold text-indigo-700 mb-1">モーションキャプチャ x リミテッド</h5>
-                                <p class="text-sm text-gray-600 leading-relaxed">
+                                <p class="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
                                     アクターの動き（ヌルヌルした生データ）を、そのまま使うとアニメには合いません。
                                     あえて「コマを間引く（ステップ化）」処理を行い、ポーズの「タメツメ」を強調することで、
                                     リアルな演技感とアニメらしいケレン味を融合させます。
@@ -613,22 +720,26 @@
             </div>
 
             <!-- 3. Future Tech (AI) -->
-            <div class="bg-white rounded-2xl p-8 shadow-sm border-l-8 border-gray-500">
+            <div class="bg-white dark:bg-slate-900 rounded-2xl p-8 shadow-sm border-l-8 border-gray-500 glass">
                 <div class="flex items-start gap-4">
-                    <div class="bg-gray-100 p-3 rounded-lg text-2xl">🤖</div>
+                    <div class="bg-gray-100 dark:bg-slate-800 p-3 rounded-lg text-gray-500">
+                        <i data-lucide="brain"></i>
+                    </div>
                     <div>
-                        <h4 class="text-xl font-bold text-gray-900 mb-2">制作支援ツールとしてのAI</h4>
-                        <p class="text-sm text-gray-600 leading-relaxed mb-4">
+                        <h4 class="text-xl font-bold text-gray-900 dark:text-white mb-2">制作支援ツールとしてのAI</h4>
+                        <p class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed mb-4">
                             クリエイティブの核心部分ではなく、「品質管理」や「単純作業の効率化」においてAI技術の導入が進んでいます。
                         </p>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div class="bg-gray-50 p-4 rounded-lg">
-                                <h5 class="font-bold text-gray-700 text-sm">ノイズ除去 (Denoising)</h5>
-                                <p class="text-xs text-gray-500 mt-1">短時間のレンダリングで発生するザラザラしたノイズを、AIが推測して綺麗に除去する技術。</p>
+                            <div class="bg-gray-50 dark:bg-slate-800 p-4 rounded-lg">
+                                <h5 class="font-bold text-gray-700 dark:text-gray-200 text-sm">ノイズ除去 (Denoising)</h5>
+                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                    短時間のレンダリングで発生するザラザラしたノイズを、AIが推測して綺麗に除去する技術。</p>
                             </div>
-                            <div class="bg-gray-50 p-4 rounded-lg">
-                                <h5 class="font-bold text-gray-700 text-sm">高解像度化 (Upscaling)</h5>
-                                <p class="text-xs text-gray-500 mt-1">過去のSD画質作品のリマスターや、4K放送用に画質を引き上げる処理に活用されています。</p>
+                            <div class="bg-gray-50 dark:bg-slate-800 p-4 rounded-lg">
+                                <h5 class="font-bold text-gray-700 dark:text-gray-200 text-sm">高解像度化 (Upscaling)</h5>
+                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                    過去のSD画質作品のリマスターや、4K放送用に画質を引き上げる処理に活用されています。</p>
                             </div>
                         </div>
                     </div>
@@ -651,7 +762,7 @@
                     <div
                         class="absolute -top-3 -left-3 w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center font-bold text-sm shadow-lg">
                         1</div>
-                    <div class="text-3xl mb-3">🧊</div>
+                    <div class="text-3xl mb-3 text-blue-400"><i data-lucide="box"></i></div>
                     <h4 class="font-bold text-blue-300 mb-2">モデリング</h4>
                     <p class="text-xs text-gray-300 leading-relaxed">法線編集を前提としたトポロジー設計。影の落ち方を計算して形状を作る。</p>
                 </div>
@@ -676,7 +787,7 @@
                     <div
                         class="absolute -top-3 -left-3 w-8 h-8 bg-indigo-500 rounded-full flex items-center justify-center font-bold text-sm shadow-lg">
                         2</div>
-                    <div class="text-3xl mb-3">🦴</div>
+                    <div class="text-3xl mb-3 text-indigo-400"><i data-lucide="bone"></i></div>
                     <h4 class="font-bold text-indigo-300 mb-2">セットアップ</h4>
                     <p class="text-xs text-gray-300 leading-relaxed">可動域より「シルエット」優先。嘘パース用の補助ボーンを仕込む。</p>
                 </div>
@@ -701,7 +812,7 @@
                     <div
                         class="absolute -top-3 -left-3 w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center font-bold text-sm shadow-lg">
                         3</div>
-                    <div class="text-3xl mb-3">🎬</div>
+                    <div class="text-3xl mb-3 text-purple-400"><i data-lucide="clapperboard"></i></div>
                     <h4 class="font-bold text-purple-300 mb-2">アニメーション</h4>
                     <p class="text-xs text-gray-300 leading-relaxed">タメツメを意識したリミテッド制作。グラフエディタでコマを抜く。</p>
                 </div>
@@ -723,8 +834,9 @@
                 </div>
                 <div class="flex flex-col md:flex-row items-center gap-6 relative z-10">
                     <div
-                        class="flex-shrink-0 w-16 h-16 bg-gradient-to-br from-pink-500 to-red-600 rounded-2xl flex items-center justify-center text-3xl shadow-lg transform rotate-3">
-                        ✨</div>
+                        class="flex-shrink-0 w-16 h-16 bg-gradient-to-br from-pink-500 to-red-600 rounded-2xl flex items-center justify-center text-white shadow-lg transform rotate-3">
+                        <i data-lucide="sparkles" class="w-10 h-10"></i>
+                    </div>
                     <div class="text-center md:text-left">
                         <h4 class="text-xl font-bold text-white mb-2">撮影 (Composite) - 魔法をかける場所</h4>
                         <p class="text-sm text-gray-300 leading-relaxed">
@@ -736,398 +848,296 @@
         </div>
     </section>
 
-    <footer class="bg-white border-t border-gray-200 mt-12 py-8">
-        <div class="max-w-7xl mx-auto px-4 text-center text-gray-500 text-sm">
+    <footer
+        class="bg-white dark:bg-slate-900 border-t border-gray-200 dark:border-slate-800 mt-12 py-8 transition-colors duration-500">
+        <div class="max-w-7xl mx-auto px-4 text-center text-gray-500 dark:text-gray-400 text-sm">
             <p>© 2026 Anime CG Research Report. Generated for Analysis.</p>
         </div>
     </footer>
 
     <!-- JavaScript Logic -->
     <script>
-        // --- 1. Radar Chart: The Uncanny Gap ---
-        const ctxRadar = document.getElementById('gapRadarChart').getContext('2d');
-        const gapRadarChart = new Chart(ctxRadar, {
-            type: 'radar',
-            data: {
-                labels: ['動きのメリハリ (Timing)', '影の制御 (Shading)', '線の抑揚 (Line)', 'パースの嘘 (Persp)', '表情の記号化 (Face)'],
-                datasets: [{
-                    label: 'Raw 3D Output',
-                    data: [20, 30, 10, 10, 40],
-                    fill: true,
-                    backgroundColor: 'rgba(239, 68, 68, 0.2)',
-                    borderColor: 'rgb(239, 68, 68)',
-                    pointBackgroundColor: 'rgb(239, 68, 68)',
-                    pointBorderColor: '#fff',
-                    pointHoverBackgroundColor: '#fff',
-                    pointHoverBorderColor: 'rgb(239, 68, 68)'
-                }, {
-                    label: 'Ideal Anime Look',
-                    data: [90, 95, 85, 80, 100],
-                    fill: true,
-                    backgroundColor: 'rgba(59, 130, 246, 0.2)',
-                    borderColor: 'rgb(59, 130, 246)',
-                    pointBackgroundColor: 'rgb(59, 130, 246)',
-                    pointBorderColor: '#fff',
-                    pointHoverBackgroundColor: '#fff',
-                    pointHoverBorderColor: 'rgb(59, 130, 246)'
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    r: {
-                        angleLines: { color: '#e5e7eb' },
-                        grid: { color: '#e5e7eb' },
-                        pointLabels: {
-                            font: { size: 11, family: "'Noto Sans JP', sans-serif" },
-                            color: '#4b5563'
-                        },
-                        suggestedMin: 0,
-                        suggestedMax: 100
-                    }
-                },
-                plugins: {
-                    legend: { position: 'bottom' }
-                }
-            }
-        });
+        // --- Global Variables ---
+        var gapRadarChart, fpsAdoptionChart;
+        var vfxCanvas, vfxCtx, vfxAnimationId;
+        var pieces = [];
+        var vfxMode = 'anime';
 
-        // --- 2. FPS Adoption Chart ---
-        const ctxBar = document.getElementById('fpsAdoptionChart').getContext('2d');
-        const fpsAdoptionChart = new Chart(ctxBar, {
-            type: 'bar',
-            data: {
-                labels: ['日常系アニメ', 'アクション/メカ', 'ゲーム(リアルタイム)'],
-                datasets: [
-                    {
-                        label: 'リミテッド (8-24fps)',
-                        data: [95, 60, 20],
-                        backgroundColor: '#3b82f6',
-                    },
-                    {
-                        label: 'フルコマ (60fps)',
-                        data: [5, 40, 80],
-                        backgroundColor: '#ef4444',
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                indexAxis: 'y',
-                scales: {
-                    x: { stacked: true, max: 100 },
-                    y: { stacked: true }
-                },
-                plugins: {
-                    tooltip: {
-                        callbacks: {
-                            label: function (context) {
-                                return context.dataset.label + ': ' + context.raw + '%';
-                            }
-                        }
-                    },
-                    legend: { position: 'bottom', labels: { boxWidth: 10 } }
-                }
-            }
-        });
+        // Initialize Lucide icons
+        lucide.createIcons();
 
-        // --- 3. Animation Simulator Logic ---
-        const ball = document.getElementById('bouncing-ball');
-        const slider = document.getElementById('fps-slider');
-        const fpsLabel = document.getElementById('fps-label');
-        const descDiv = document.getElementById('fps-description');
-
-        let animationId;
-        let position = 0;
-        let direction = 1;
-        let speed = 2; // base speed
-        let lastTime = 0;
-
-        // Simulation variables
-        const fpsSettings = {
-            3: { fps: 60, label: "60 FPS (Raw 3D)", text: "滑らかすぎて、まるで人形のような動きに見えます。重量感や質感が伝わりにくい状態です。", color: "text-red-600", bg: "bg-red-50", border: "border-red-500" },
-            2: { fps: 24, label: "24 FPS (TV Anime)", text: "標準的なTVアニメのフレームレートです。滑らかさと動きのメリハリのバランスが取れています。", color: "text-blue-600", bg: "bg-blue-50", border: "border-blue-500" },
-            1: { fps: 12, label: "12 FPS (Limited)", text: "コマが飛ぶ感覚はありますが、ポーズが強調されるため、特にアクションシーンなどで迫力が生まれます。", color: "text-purple-600", bg: "bg-purple-50", border: "border-purple-500" }
+        // --- Theme Toggle logic ---
+        const themeToggle = document.getElementById('theme-toggle');
+        const themeReveal = document.getElementById('theme-reveal');
+        const sunIcon = document.getElementById('sun-icon');
+        const moonIcon = document.getElementById('moon-icon');
+        const getInitialTheme = () => {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme) return savedTheme;
+            return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
         };
+        let currentTheme = getInitialTheme();
 
-        // Custom Animation Loop to simulate specific FPS
-        function animate(currentTime) {
-            const val = parseInt(slider.value);
-            const targetFPS = fpsSettings[val].fps;
-            const interval = 1000 / targetFPS;
+        function applyTheme(theme) {
+            currentTheme = theme;
+            const isDark = theme === 'dark';
+            const textColor = isDark ? '#94a3b8' : '#718096';
+            const gridColor = isDark ? '#334155' : '#e2e8f0';
+            const tickBackdrop = isDark ? 'transparent' : 'rgba(255, 255, 255, 0.8)';
 
-            if (currentTime - lastTime > interval) {
-                lastTime = currentTime;
-
-                // Update position
-                position += speed * direction;
-                const trackWidth = document.getElementById('anim-track').clientWidth - 40; // -ball width
-
-                if (position > trackWidth) {
-                    position = trackWidth;
-                    direction = -1;
-                } else if (position < 0) {
-                    position = 0;
-                    direction = 1;
-                }
-
-                ball.style.left = position + 'px';
+            if (isDark) {
+                document.documentElement.classList.add('dark');
+                sunIcon.classList.add('hidden');
+                moonIcon.classList.remove('hidden');
+            } else {
+                document.documentElement.classList.remove('dark');
+                sunIcon.classList.remove('hidden');
+                moonIcon.classList.add('hidden');
             }
-            animationId = requestAnimationFrame(animate);
+
+            // Global Defaults
+            Chart.defaults.color = textColor;
+            Chart.defaults.borderColor = gridColor;
+
+            if (gapRadarChart) {
+                const r = gapRadarChart.options.scales.r;
+                r.grid.color = gridColor;
+                r.angleLines.color = gridColor;
+                r.pointLabels.color = textColor;
+                r.ticks.color = textColor;
+                r.ticks.backdropColor = tickBackdrop;
+                gapRadarChart.options.plugins.legend.labels.color = textColor;
+                gapRadarChart.update();
+            }
+            if (fpsAdoptionChart) {
+                const x = fpsAdoptionChart.options.scales.x;
+                const y = fpsAdoptionChart.options.scales.y;
+                x.grid.color = gridColor;
+                y.grid.color = gridColor;
+                x.ticks.color = textColor;
+                y.ticks.color = textColor;
+                fpsAdoptionChart.options.plugins.legend.labels.color = textColor;
+                fpsAdoptionChart.update();
+            }
         }
 
-        // Start animation
-        requestAnimationFrame(animate);
-
-        // Slider Event
-        slider.addEventListener('input', (e) => {
-            const val = e.target.value;
-            const setting = fpsSettings[val];
-
-            fpsLabel.textContent = setting.label;
-            fpsLabel.className = setting.color;
-
-            descDiv.textContent = setting.text;
-            descDiv.className = `${setting.bg} p-4 rounded-lg text-sm ${setting.color.replace('text', 'text')} border-l-4 ${setting.border}`;
+        themeToggle.addEventListener('click', () => {
+            const nextTheme = currentTheme === 'light' ? 'dark' : 'light';
+            themeReveal.classList.add('active');
+            setTimeout(() => {
+                applyTheme(nextTheme);
+                localStorage.setItem('theme', nextTheme);
+                setTimeout(() => { themeReveal.classList.remove('active'); }, 800);
+            }, 400);
         });
 
-        // --- 4. Normal Editing Visualizer Logic ---
-        const shadowVisual = document.getElementById('shadow-visual');
-        const shadowCaption = document.getElementById('shadow-caption');
-        const normalDetailBox = document.getElementById('normal-detail-box');
-        const normalTitle = normalDetailBox.querySelector('h4');
-        const normalDesc = normalDetailBox.querySelector('p');
+        // --- Charts ---
+        function initCharts() {
+            const ctxRadar = document.getElementById('gapRadarChart').getContext('2d');
+            gapRadarChart = new Chart(ctxRadar, {
+                type: 'radar',
+                data: {
+                    labels: ['動きのメリハリ', '影の制御', '線の抑揚', 'パースの嘘', '表情の記号化'],
+                    datasets: [{
+                        label: '調整なしの3D出力',
+                        data: [20, 30, 10, 10, 40],
+                        backgroundColor: 'rgba(239, 68, 68, 0.2)',
+                        borderColor: 'rgb(239, 68, 68)',
+                    }, {
+                        label: '理想のアニメルック',
+                        data: [90, 95, 85, 80, 100],
+                        backgroundColor: 'rgba(59, 130, 246, 0.2)',
+                        borderColor: 'rgb(59, 130, 246)',
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: { r: { suggestedMin: 0, suggestedMax: 100 } },
+                    plugins: { legend: { position: 'bottom', labels: { boxWidth: 10 } } }
+                }
+            });
 
-        const normalData = {
-            'raw': {
-                title: '選択中の技術: 物理的に正しい法線',
-                desc: 'モデルの形状を忠実に反映して影が落ちます。鼻の横や口元に意図しない影ができやすく、特に女性や子供のキャラクターでは可愛らしさを損なう原因になります。',
-                caption: '複雑でガタついた境界',
-                gradient: 'radial-gradient(circle at 30% 30%, #555, #000)', // Simulate complex/dark shading
-                boxColor: 'bg-red-900',
-                titleColor: 'text-red-300'
-            },
-            'adjusted': {
-                title: '選択中の技術: 編集された法線 (球転写)',
-                desc: '「ギルティギア」シリーズや「宝石の国」などで有名になった手法。顔の法線情報をシンプルな球体の法線情報で上書き（転写）します。どの角度から見ても影が滑らかになります。',
-                caption: '滑らかで単純な境界',
-                gradient: 'linear-gradient(135deg, #ffffff 0%, #3b82f6 50%, #1e3a8a 100%)', // Smooth anime gradient
-                boxColor: 'bg-slate-800',
-                titleColor: 'text-blue-300'
-            },
-            'flat': {
-                title: '選択中の技術: 完全な嘘 (記号的影)',
-                desc: '光源計算を行わず、テクスチャに直接影を描き込んだり、シェーダーで「顔の半分は常に明るい」と強制的に定義する手法。角度を変えると破綻しやすいですが、決めカットでは絶大な効果を発揮します。',
-                caption: '完全に二極化した境界',
-                gradient: 'linear-gradient(90deg, #ffffff 50%, #000000 50%)', // Hard cut
-                boxColor: 'bg-green-900',
-                titleColor: 'text-green-300'
+            const ctxBar = document.getElementById('fpsAdoptionChart').getContext('2d');
+            fpsAdoptionChart = new Chart(ctxBar, {
+                type: 'bar',
+                data: {
+                    labels: ['日常系', 'アクション', 'ゲーム'],
+                    datasets: [
+                        { label: 'リミテッド', data: [95, 60, 20], backgroundColor: '#3b82f6' },
+                        { label: 'フルコマ', data: [5, 40, 80], backgroundColor: '#ef4444' }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: 'y',
+                    scales: { x: { stacked: true, max: 100 }, y: { stacked: true } },
+                    plugins: { legend: { position: 'bottom', labels: { boxWidth: 10 } } }
+                }
+            });
+            applyTheme(currentTheme);
+        }
+
+        // --- Simulators ---
+        function initFpsSimulator() {
+            const ball = document.getElementById('bouncing-ball');
+            const slider = document.getElementById('fps-slider');
+            const fpsLabel = document.getElementById('fps-label');
+            const descDiv = document.getElementById('fps-description');
+            let position = 0, direction = 1, lastTime = 0;
+            const settings = {
+                3: { fps: 60, label: "60 FPS (Raw 3D)", text: "滑らかすぎて人形のような動きです。", color: "text-red-600", bg: "bg-red-50", border: "border-red-500" },
+                2: { fps: 24, label: "24 FPS (TV Anime)", text: "標準的なTVアニメのバランスです。", color: "text-blue-600", bg: "bg-blue-50", border: "border-blue-500" },
+                1: { fps: 12, label: "12 FPS (Limited)", text: "動きのメリハリが強調されます。", color: "text-purple-600", bg: "bg-purple-50", border: "border-purple-500" }
+            };
+
+            function animate(currentTime) {
+                const val = slider.value;
+                const interval = 1000 / settings[val].fps;
+                if (currentTime - lastTime > interval) {
+                    lastTime = currentTime;
+                    const trackWidth = document.getElementById('anim-track').clientWidth - 40;
+                    position += 4 * direction;
+                    if (position > trackWidth || position < 0) direction *= -1;
+                    ball.style.left = Math.max(0, Math.min(position, trackWidth)) + 'px';
+                }
+                requestAnimationFrame(animate);
             }
+            requestAnimationFrame(animate);
+
+            slider.addEventListener('input', (e) => {
+                const s = settings[e.target.value];
+                fpsLabel.textContent = s.label;
+                fpsLabel.className = s.color;
+                descDiv.textContent = s.text;
+                descDiv.className = `${s.bg} dark:bg-slate-800 p-4 rounded-lg text-sm ${s.color} border-l-4 ${s.border}`;
+            });
+        }
+
+        // --- Normal editing ---
+        const normalData = {
+            'raw': { title: '物理的に正しい法線', desc: '形状を忠実に反映。意図しない影が出やすい。', caption: 'ガタついた境界', gradient: 'radial-gradient(circle at 30% 30%, #555, #000)', boxColor: 'bg-red-900', titleColor: 'text-red-300' },
+            'adjusted': { title: '編集された法線 (球転写)', desc: '法線を上書き。影が常に滑らか。', caption: '滑らかな境界', gradient: 'linear-gradient(135deg, #ffffff 0%, #3b82f6 50%, #1e3a8a 100%)', boxColor: 'bg-slate-800', titleColor: 'text-blue-300' },
+            'flat': { title: '完全な嘘 (記号的影)', desc: 'シェーダーで強制定義。決めカットに有効。', caption: '二極化した境界', gradient: 'linear-gradient(90deg, #ffffff 50%, #000000 50%)', boxColor: 'bg-green-900', titleColor: 'text-green-300' }
         };
 
         function updateNormalInfo(key) {
             const data = normalData[key];
+            const detailBox = document.getElementById('normal-detail-box');
+            detailBox.querySelector('h4').textContent = data.title;
+            detailBox.querySelector('h4').className = `text-lg font-bold ${data.titleColor} mb-2`;
+            detailBox.querySelector('p').textContent = data.desc;
+            document.getElementById('shadow-caption').textContent = data.caption;
+            document.getElementById('shadow-visual').style.background = data.gradient;
+            detailBox.className = `mt-8 ${data.boxColor} text-white p-6 rounded-xl transition-all`;
 
-            // Update Text
-            normalTitle.textContent = data.title;
-            normalTitle.className = `text-lg font-bold ${data.titleColor} mb-2`;
-            normalDesc.textContent = data.desc;
-            shadowCaption.textContent = data.caption;
-
-            // Update Visuals
-            shadowVisual.style.background = data.gradient;
-            normalDetailBox.className = `mt-8 ${data.boxColor} text-white p-6 rounded-xl shadow-inner transition-all duration-300`;
-
-            // Update Button Selection State
-            ['raw', 'adjusted', 'flat'].forEach(idKey => {
-                const card = document.getElementById(`card-${idKey}`);
-                const header = card.querySelector('h4');
-
-                if (idKey === key) {
-                    // Active State
-                    card.classList.remove('border', 'border-gray-200');
-                    card.classList.add('border-2', 'border-blue-500', 'shadow-md');
-
-                    header.classList.remove('text-gray-800');
-                    header.classList.add('text-blue-700');
+            ['raw', 'adjusted', 'flat'].forEach(k => {
+                const card = document.getElementById(`card-${k}`);
+                const title = card.querySelector('h4');
+                if (k === key) {
+                    card.className = "interactive-card bg-blue-50 dark:bg-blue-900/40 p-6 rounded-xl border-2 border-blue-500 text-center group cursor-pointer shadow-md glass transition-all";
+                    title.className = "font-bold text-blue-700 dark:text-blue-300";
                 } else {
-                    // Inactive State
-                    card.classList.remove('border-2', 'border-blue-500', 'shadow-md');
-                    card.classList.add('border', 'border-gray-200');
-
-                    header.classList.remove('text-blue-700');
-                    header.classList.add('text-gray-800');
+                    card.className = "interactive-card bg-white dark:bg-slate-900 p-6 rounded-xl border border-gray-200 dark:border-slate-800 text-center group cursor-pointer glass transition-all";
+                    title.className = "font-bold text-gray-800 dark:text-gray-100";
                 }
             });
         }
 
-        // Initialize with default view (Adjusted)
-        updateNormalInfo('adjusted');
-
-        // --- 5. Tab Switching Logic for Advanced Techniques ---
-        function switchTab(type) {
-            const tabs = ['char', 'bg', 'vfx'];
-
-            tabs.forEach(t => {
-                const btn = document.getElementById(`tab-${t}`);
-                const content = document.getElementById(`content-${t}`);
-
-                if (t === type) {
-                    // Show Content
+        // --- Tabs ---
+        function switchTab(tab) {
+            ['char', 'bg', 'vfx'].forEach(t => {
+                const btn = document.getElementById('tab-nav-' + t);
+                const content = document.getElementById('content-' + t);
+                if (t === tab) {
                     content.classList.remove('hidden');
-                    content.classList.add('block');
-
-                    // Active Button Style
-                    let activeClass = 'bg-blue-600'; // Default Char
-                    if (t === 'bg') activeClass = 'bg-green-600';
-                    if (t === 'vfx') activeClass = 'bg-purple-600';
-
-                    btn.classList.add(activeClass, 'text-white', 'shadow-md');
-                    btn.classList.remove('text-gray-500', 'hover:text-gray-700', 'hover:bg-gray-50');
+                    btn.classList.add('bg-blue-600', 'text-white');
+                    btn.classList.remove('text-gray-500', 'dark:text-gray-400', 'hover:bg-gray-50', 'dark:hover:bg-slate-800');
                 } else {
-                    // Hide Content
-                    content.classList.remove('block');
                     content.classList.add('hidden');
-
-                    // Inactive Button Style
-                    btn.classList.remove('bg-blue-600', 'bg-green-600', 'bg-purple-600', 'text-white', 'shadow-md');
-                    btn.classList.add('text-gray-500', 'hover:text-gray-700', 'hover:bg-gray-50');
+                    btn.classList.remove('bg-blue-600', 'text-white');
+                    btn.classList.add('text-gray-500', 'dark:text-gray-400', 'hover:bg-gray-50', 'dark:hover:bg-slate-800');
                 }
             });
-
-            // Adjust VFX canvas size if visible
-            if (type === 'vfx') {
-                resizeVfxCanvas();
-            }
+            if (tab === 'vfx') setTimeout(initVfx, 100);
         }
 
-        // --- 6. Particle Simulator Logic ---
-        const vfxCanvas = document.getElementById('vfxCanvas');
-        const vfxCtx = vfxCanvas.getContext('2d');
-        let vfxMode = 'anime'; // 'real' or 'anime'
-        let particles = [];
-        let vfxAnimationId;
-
-        function setVfxMode(mode) {
-            vfxMode = mode;
-            // Update buttons
-            document.getElementById('btn-vfx-real').className = mode === 'real'
-                ? 'px-4 py-2 rounded bg-blue-500 text-white text-sm shadow-lg shadow-blue-500/50 transition'
-                : 'px-4 py-2 rounded bg-gray-700 text-gray-300 text-sm hover:bg-gray-600 transition';
-
-            document.getElementById('btn-vfx-anime').className = mode === 'anime'
-                ? 'px-4 py-2 rounded bg-purple-600 text-white text-sm shadow-lg shadow-purple-500/50 transition'
-                : 'px-4 py-2 rounded bg-gray-700 text-gray-300 text-sm hover:bg-gray-600 transition';
-        }
-
-        function resizeVfxCanvas() {
-            const rect = vfxCanvas.parentElement.getBoundingClientRect();
-            vfxCanvas.width = rect.width - 32; // padding
-            vfxCanvas.height = 300;
-        }
-        window.addEventListener('resize', resizeVfxCanvas);
-
+        // --- VFX ---
         class Particle {
             constructor(x, y, mode) {
-                this.x = x;
-                this.y = y;
-                this.mode = mode;
-                const angle = Math.random() * Math.PI * 2;
-                const speed = Math.random() * 2 + 1;
-                this.vx = Math.cos(angle) * speed;
-                this.vy = Math.sin(angle) * speed;
+                this.x = x; this.y = y; this.mode = mode;
+                const angle = Math.random() * Math.PI * 2, speed = Math.random() * 2 + 1;
+                this.vx = Math.cos(angle) * speed; this.vy = Math.sin(angle) * speed;
                 this.life = 1.0;
-
                 if (mode === 'anime') {
-                    this.vx *= 1.5; // Faster, snappier
-                    this.vy *= 1.5;
-                    this.size = Math.random() * 15 + 5;
-                    this.color = `hsl(${Math.random() * 60 + 10}, 100%, 60%)`; // Fire colors
-                    this.decay = 0.05; // Fast decay (limited frames)
+                    this.vx *= 1.5; this.vy *= 1.5; this.size = Math.random() * 15 + 5;
+                    this.color = `hsl(${Math.random() * 60 + 10}, 100%, 60%)`; this.decay = 0.05;
                 } else {
-                    this.size = Math.random() * 3 + 1;
-                    this.color = `rgba(255, 100, 50, 0.8)`;
-                    this.decay = 0.01; // Slow smooth decay
+                    this.size = Math.random() * 3 + 1; this.color = `rgba(255, 100, 50, 0.8)`; this.decay = 0.01;
                 }
             }
-
             update() {
-                this.x += this.vx;
-                this.y += this.vy;
-                this.life -= this.decay;
-
-                if (this.mode === 'real') {
-                    this.vy += 0.05; // Gravity
-                }
+                this.x += this.vx; this.y += this.vy; this.life -= this.decay;
+                if (this.mode === 'real') this.vy += 0.05;
             }
-
             draw(ctx) {
                 ctx.beginPath();
                 if (this.mode === 'anime') {
-                    // Anime: Solid circles, shrinking, no alpha fade until end
-                    const drawSize = this.size * (this.life > 0.5 ? 1 : 0.5); // Stepped size
-                    ctx.fillStyle = this.color;
-                    ctx.arc(this.x, this.y, drawSize, 0, Math.PI * 2);
-                    ctx.fill();
-
-                    // Add outline
-                    ctx.strokeStyle = 'white';
-                    ctx.lineWidth = 2;
-                    ctx.stroke();
+                    const s = this.size * (this.life > 0.5 ? 1 : 0.5);
+                    ctx.fillStyle = this.color; ctx.arc(this.x, this.y, s, 0, Math.PI * 2); ctx.fill();
+                    ctx.strokeStyle = 'white'; ctx.lineWidth = 2; ctx.stroke();
                 } else {
-                    // Real: Smooth alpha fade, soft edges
-                    ctx.globalAlpha = this.life;
-                    ctx.fillStyle = this.color;
-                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                    ctx.fill();
-                    ctx.globalAlpha = 1.0;
+                    ctx.globalAlpha = this.life; ctx.fillStyle = this.color; ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill(); ctx.globalAlpha = 1.0;
                 }
             }
         }
 
+        function initVfx() {
+            vfxCanvas = document.getElementById('vfxCanvas');
+            if (!vfxCanvas) return;
+            vfxCtx = vfxCanvas.getContext('2d');
+            if (vfxAnimationId) cancelAnimationFrame(vfxAnimationId);
+            resizeVfxCanvas();
+            pieces = [];
+            loopVfx();
+        }
+
+        function resizeVfxCanvas() {
+            if (!vfxCanvas) return;
+            vfxCanvas.width = vfxCanvas.parentElement.clientWidth - 32;
+            vfxCanvas.height = 300;
+        }
+
         function loopVfx() {
-            // Anime mode: Update less frequently to simulate limited animation (e.g. on 2s or 3s)
-            // But for smooth UI, we'll just update physics every frame but draw differently
-
             vfxCtx.clearRect(0, 0, vfxCanvas.width, vfxCanvas.height);
-
-            // Generate automatic particles occasionally
-            if (Math.random() < 0.05) {
-                const cx = vfxCanvas.width / 2;
-                const cy = vfxCanvas.height / 2;
-                createExplosion(cx, cy);
+            if (Math.random() < 0.05) createExplosion(vfxCanvas.width / 2, vfxCanvas.height / 2);
+            for (let i = pieces.length - 1; i >= 0; i--) {
+                pieces[i].update(); pieces[i].draw(vfxCtx);
+                if (pieces[i].life <= 0) pieces.splice(i, 1);
             }
-
-            for (let i = particles.length - 1; i >= 0; i--) {
-                const p = particles[i];
-                p.update();
-                p.draw(vfxCtx);
-                if (p.life <= 0) {
-                    particles.splice(i, 1);
-                }
-            }
-
             vfxAnimationId = requestAnimationFrame(loopVfx);
         }
 
         function createExplosion(x, y) {
-            const count = vfxMode === 'anime' ? 8 : 50; // Anime uses fewer, bolder shapes
-            for (let i = 0; i < count; i++) {
-                particles.push(new Particle(x, y, vfxMode));
-            }
+            const count = vfxMode === 'anime' ? 8 : 50;
+            for (let i = 0; i < count; i++) pieces.push(new Particle(x, y, vfxMode));
         }
 
-        vfxCanvas.addEventListener('mousedown', (e) => {
-            const rect = vfxCanvas.getBoundingClientRect();
-            createExplosion(e.clientX - rect.left, e.clientY - rect.top);
-        });
+        function setVfxMode(mode) {
+            vfxMode = mode;
+            document.getElementById('btn-vfx-real').className = mode === 'real' ? 'px-4 py-2 rounded bg-blue-500 text-white text-sm' : 'px-4 py-2 rounded bg-gray-700 text-gray-300 text-sm';
+            document.getElementById('btn-vfx-anime').className = mode === 'anime' ? 'px-4 py-2 rounded bg-purple-600 text-white text-sm' : 'px-4 py-2 rounded bg-gray-700 text-gray-300 text-sm';
+        }
 
-        // Start loop
-        loopVfx();
-        setVfxMode('anime'); // Initialize VFX mode to anime
-        resizeVfxCanvas();
+        window.addEventListener('resize', resizeVfxCanvas);
+        document.addEventListener('DOMContentLoaded', () => {
+            initCharts(); initFpsSimulator(); updateNormalInfo('adjusted');
+            const el = document.getElementById('vfxCanvas');
+            if (el) el.addEventListener('mousedown', (e) => {
+                const r = el.getBoundingClientRect(); createExplosion(e.clientX - r.left, e.clientY - r.top);
+            });
+        });
     </script>
 </body>
 
