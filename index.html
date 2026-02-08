@@ -14,7 +14,7 @@
                     colors: {
                         brand: {
                             blue: '#3182ce',
-                            dark: '#0f172a'
+                            dark: '#020617'
                         }
                     }
                 }
@@ -35,10 +35,10 @@
         }
 
         .dark {
-            --bg-color: #0f172a;
+            --bg-color: #020617;
             --text-color: #f1f5f9;
-            --card-bg: rgba(30, 41, 59, 0.7);
-            --border-color: #334155;
+            --card-bg: rgba(15, 23, 42, 0.7);
+            --border-color: #1e293b;
             --accent-blue: #60a5fa;
         }
 
@@ -126,6 +126,12 @@
             background-color: #e2e8f0;
             border-radius: 8px;
             overflow: hidden;
+            transition: background-color 0.3s ease;
+        }
+
+        .dark #anim-track {
+            background-color: #1e293b;
+            /* Slate-800 */
         }
 
         @keyframes fadeIn {
@@ -173,7 +179,7 @@
 
     <!-- Navigation / Header -->
     <header
-        class="bg-white/90 dark:bg-slate-900/90 backdrop-blur-md shadow-sm sticky top-0 z-50 border-b border-gray-200/50 dark:border-slate-800/50">
+        class="bg-white/90 dark:bg-slate-950/90 backdrop-blur-md shadow-sm sticky top-0 z-50 border-b border-gray-200/50 dark:border-slate-800/50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
             <h1 class="text-xl font-bold text-gray-800 dark:text-white tracking-tight flex items-center gap-2">
                 <i data-lucide="zap" class="text-blue-600 w-6 h-6"></i>
@@ -239,7 +245,7 @@
 
     <!-- Core Interactive Section: Motion & Timing -->
     <section id="motion"
-        class="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto dark:bg-slate-900/50 bg-gray-50 rounded-3xl my-8">
+        class="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto dark:bg-slate-950/50 bg-gray-50 rounded-3xl my-8">
         <div class="mb-8">
             <h3 class="text-2xl font-bold text-gray-900 dark:text-white flex items-center">
                 <span class="bg-blue-600 text-white p-2 rounded-lg text-sm mr-3">技術 01</span>
@@ -254,7 +260,7 @@
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
             <!-- Simulator -->
             <div
-                class="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-md border border-gray-200 dark:border-slate-800 glass">
+                class="bg-white dark:bg-slate-950 p-6 rounded-2xl shadow-md border border-gray-200 dark:border-slate-800 glass">
                 <h4 class="font-bold text-gray-800 dark:text-gray-100 mb-4 text-center">フレームレート体感シミュレーター</h4>
 
                 <div id="anim-track" class="mb-6 relative">
@@ -290,9 +296,8 @@
                         </div>
                     </div>
 
-                    <div id="fps-description"
-                        class="bg-blue-50 p-4 rounded-lg text-sm text-blue-800 border-l-4 border-blue-500">
-                        滑らかすぎて「人形っぽい」動きです。重量感が感じられにくい状態です。
+                    <div id="fps-description" class="transition-all duration-300 shadow-inner">
+                        <!-- Initialized by JS -->
                     </div>
                 </div>
             </div>
@@ -340,7 +345,7 @@
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <!-- Concept Visualizer 1: Raw Normals -->
             <div id="card-raw"
-                class="interactive-card bg-white dark:bg-slate-900 p-6 rounded-xl border border-gray-200 dark:border-slate-800 text-center group cursor-pointer glass"
+                class="interactive-card bg-white dark:bg-slate-950 p-6 rounded-xl border border-gray-200 dark:border-slate-800 text-center group cursor-pointer glass"
                 onclick="updateNormalInfo('raw')">
                 <div
                     class="w-16 h-16 bg-gray-100 dark:bg-slate-800 rounded-full mx-auto mb-4 flex items-center justify-center text-blue-600 transition group-hover:bg-red-100 dark:group-hover:bg-red-900/30">
@@ -352,7 +357,7 @@
 
             <!-- Concept Visualizer 2: Adjusted Normals -->
             <div id="card-adjusted"
-                class="interactive-card bg-white dark:bg-slate-900 p-6 rounded-xl border border-gray-200 dark:border-slate-800 text-center group cursor-pointer glass"
+                class="interactive-card bg-white dark:bg-slate-950 p-6 rounded-xl border border-gray-200 dark:border-slate-800 text-center group cursor-pointer glass"
                 onclick="updateNormalInfo('adjusted')">
                 <div
                     class="w-16 h-16 bg-gray-100 dark:bg-slate-800 rounded-full mx-auto mb-4 flex items-center justify-center text-blue-600 transition group-hover:bg-blue-100 dark:group-hover:bg-blue-900/30">
@@ -365,7 +370,7 @@
 
             <!-- Concept Visualizer 3: Flat/Symbolic -->
             <div id="card-flat"
-                class="interactive-card bg-white dark:bg-slate-900 p-6 rounded-xl border border-gray-200 dark:border-slate-800 text-center group cursor-pointer glass"
+                class="interactive-card bg-white dark:bg-slate-950 p-6 rounded-xl border border-gray-200 dark:border-slate-800 text-center group cursor-pointer glass"
                 onclick="updateNormalInfo('flat')">
                 <div
                     class="w-16 h-16 bg-gray-100 dark:bg-slate-800 rounded-full mx-auto mb-4 flex items-center justify-center text-blue-600 group-hover:bg-green-100 dark:group-hover:bg-green-900/30 transition">
@@ -402,7 +407,7 @@
 
     <!-- Additional Techniques List (Outline & Deformation) -->
     <section
-        class="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto dark:bg-slate-900 bg-white border-t border-gray-100 dark:border-slate-800 transition-colors duration-500">
+        class="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto dark:bg-slate-950 bg-white border-t border-gray-100 dark:border-slate-800 transition-colors duration-500">
         <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-8">その他の重要アプローチ</h3>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
             <!-- Technique 3 -->
@@ -438,7 +443,7 @@
 
     <!-- Deep Dive: Professional Workflow Techniques -->
     <section id="advanced-techniques"
-        class="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto bg-gray-50 dark:bg-slate-900/50 my-12 rounded-3xl border border-gray-200 dark:border-slate-800 transition-colors duration-500">
+        class="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto bg-gray-50 dark:bg-slate-950/50 my-12 rounded-3xl border border-gray-200 dark:border-slate-800 transition-colors duration-500">
         <div class="text-center mb-10">
             <h3 class="text-3xl font-extrabold text-gray-900 dark:text-white">
                 プロフェッショナルの現場技術
@@ -471,7 +476,7 @@
         <!-- Content Area: Character -->
         <div id="content-char" class="space-y-12 animate-fade-in block">
             <!-- 1. Shader & Material -->
-            <div class="bg-white dark:bg-slate-900 rounded-2xl p-8 shadow-sm border-l-8 border-blue-500 glass">
+            <div class="bg-white dark:bg-slate-950 rounded-2xl p-8 shadow-sm border-l-8 border-blue-500 glass">
                 <div class="flex items-start gap-4">
                     <div class="bg-blue-100 dark:bg-blue-900/40 p-3 rounded-lg text-blue-600 dark:text-blue-400">
                         <i data-lucide="palette"></i>
@@ -504,7 +509,7 @@
             </div>
 
             <!-- 2. Camera & Rig -->
-            <div class="bg-white dark:bg-slate-900 rounded-2xl p-8 shadow-sm border-l-8 border-blue-400 glass">
+            <div class="bg-white dark:bg-slate-950 rounded-2xl p-8 shadow-sm border-l-8 border-blue-400 glass">
                 <div class="flex items-start gap-4">
                     <div class="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg text-blue-500">
                         <i data-lucide="video"></i>
@@ -542,7 +547,7 @@
             </div>
 
             <!-- 3. Composite -->
-            <div class="bg-white dark:bg-slate-900 rounded-2xl p-8 shadow-sm border-l-8 border-indigo-500 glass">
+            <div class="bg-white dark:bg-slate-950 rounded-2xl p-8 shadow-sm border-l-8 border-indigo-500 glass">
                 <div class="flex items-start gap-4">
                     <div class="bg-indigo-100 dark:bg-indigo-900/30 p-3 rounded-lg text-indigo-600">
                         <i data-lucide="sparkles"></i>
@@ -576,7 +581,7 @@
         <!-- Content Area: Background -->
         <div id="content-bg" class="space-y-12 animate-fade-in hidden">
             <!-- 1. Material & Shader -->
-            <div class="bg-white dark:bg-slate-900 rounded-2xl p-8 shadow-sm border-l-8 border-green-500 glass">
+            <div class="bg-white dark:bg-slate-950 rounded-2xl p-8 shadow-sm border-l-8 border-green-500 glass">
                 <div class="flex items-start gap-4">
                     <div class="bg-green-100 dark:bg-green-900/30 p-3 rounded-lg text-green-600">
                         <i data-lucide="brush"></i>
@@ -605,7 +610,7 @@
             </div>
 
             <!-- 2. Camera & Layout -->
-            <div class="bg-white dark:bg-slate-900 rounded-2xl p-8 shadow-sm border-l-8 border-green-600 glass">
+            <div class="bg-white dark:bg-slate-950 rounded-2xl p-8 shadow-sm border-l-8 border-green-600 glass">
                 <div class="flex items-start gap-4">
                     <div class="bg-green-50 dark:bg-green-900/20 p-3 rounded-lg text-green-500">
                         <i data-lucide="ruler"></i>
@@ -622,7 +627,7 @@
             </div>
 
             <!-- 3. Composite -->
-            <div class="bg-white dark:bg-slate-900 rounded-2xl p-8 shadow-sm border-l-8 border-orange-500 glass">
+            <div class="bg-white dark:bg-slate-950 rounded-2xl p-8 shadow-sm border-l-8 border-orange-500 glass">
                 <div class="flex items-start gap-4">
                     <div class="bg-orange-100 dark:bg-orange-900/30 p-3 rounded-lg text-orange-600">
                         <i data-lucide="cloud-sun"></i>
@@ -657,7 +662,7 @@
         <!-- Content Area: VFX & Future -->
         <div id="content-vfx" class="space-y-12 animate-fade-in hidden">
             <!-- 1. Particle Simulator -->
-            <div class="bg-white dark:bg-slate-900 rounded-2xl p-8 shadow-sm border-l-8 border-purple-500 glass">
+            <div class="bg-white dark:bg-slate-950 rounded-2xl p-8 shadow-sm border-l-8 border-purple-500 glass">
                 <div class="flex items-start gap-4 mb-6">
                     <div class="bg-purple-100 dark:bg-purple-900/30 p-3 rounded-lg text-purple-600">
                         <i data-lucide="wand-2"></i>
@@ -688,7 +693,7 @@
             </div>
 
             <!-- 2. Production Revolution -->
-            <div class="bg-white dark:bg-slate-900 rounded-2xl p-8 shadow-sm border-l-8 border-indigo-600 glass">
+            <div class="bg-white dark:bg-slate-950 rounded-2xl p-8 shadow-sm border-l-8 border-indigo-600 glass">
                 <div class="flex items-start gap-4">
                     <div class="bg-indigo-100 dark:bg-indigo-900/30 p-3 rounded-lg text-indigo-600">
                         <i data-lucide="gamepad-2"></i>
@@ -720,7 +725,7 @@
             </div>
 
             <!-- 3. Future Tech (AI) -->
-            <div class="bg-white dark:bg-slate-900 rounded-2xl p-8 shadow-sm border-l-8 border-gray-500 glass">
+            <div class="bg-white dark:bg-slate-950 rounded-2xl p-8 shadow-sm border-l-8 border-gray-500 glass">
                 <div class="flex items-start gap-4">
                     <div class="bg-gray-100 dark:bg-slate-800 p-3 rounded-lg text-gray-500">
                         <i data-lucide="brain"></i>
@@ -849,7 +854,7 @@
     </section>
 
     <footer
-        class="bg-white dark:bg-slate-900 border-t border-gray-200 dark:border-slate-800 mt-12 py-8 transition-colors duration-500">
+        class="bg-white dark:bg-slate-950 border-t border-gray-200 dark:border-slate-800 mt-12 py-8 transition-colors duration-500">
         <div class="max-w-7xl mx-auto px-4 text-center text-gray-500 dark:text-gray-400 text-sm">
             <p>© 2026 Anime CG Research Report. Generated for Analysis.</p>
         </div>
@@ -883,7 +888,7 @@
             const isDark = theme === 'dark';
             const textColor = isDark ? '#94a3b8' : '#718096';
             const gridColor = isDark ? '#334155' : '#e2e8f0';
-            const tickBackdrop = isDark ? 'transparent' : 'rgba(255, 255, 255, 0.8)';
+            const tickBackdrop = isDark ? 'rgba(2, 6, 23, 1)' : 'rgba(255, 255, 255, 0.8)';
 
             if (isDark) {
                 document.documentElement.classList.add('dark');
@@ -987,9 +992,9 @@
             const descDiv = document.getElementById('fps-description');
             let position = 0, direction = 1, lastTime = 0;
             const settings = {
-                3: { fps: 60, label: "60 FPS (Raw 3D)", text: "滑らかすぎて人形のような動きです。", color: "text-red-600", bg: "bg-red-50", border: "border-red-500" },
-                2: { fps: 24, label: "24 FPS (TV Anime)", text: "標準的なTVアニメのバランスです。", color: "text-blue-600", bg: "bg-blue-50", border: "border-blue-500" },
-                1: { fps: 12, label: "12 FPS (Limited)", text: "動きのメリハリが強調されます。", color: "text-purple-600", bg: "bg-purple-50", border: "border-purple-500" }
+                3: { fps: 60, label: "60 FPS (Raw 3D)", text: "滑らかすぎて人形のような動きです。", color: "text-red-600 dark:text-red-400", bg: "bg-red-50 dark:bg-red-950/20", border: "border-red-500" },
+                2: { fps: 24, label: "24 FPS (TV Anime)", text: "標準的なTVアニメのバランスです。", color: "text-blue-600 dark:text-blue-400", bg: "bg-blue-50 dark:bg-blue-950/20", border: "border-blue-500" },
+                1: { fps: 12, label: "12 FPS (Limited)", text: "動きのメリハリが強調されます。", color: "text-purple-600 dark:text-purple-400", bg: "bg-purple-50 dark:bg-purple-950/20", border: "border-purple-500" }
             };
 
             function animate(currentTime) {
@@ -1006,13 +1011,16 @@
             }
             requestAnimationFrame(animate);
 
-            slider.addEventListener('input', (e) => {
-                const s = settings[e.target.value];
+            const updateUI = () => {
+                const s = settings[slider.value];
                 fpsLabel.textContent = s.label;
                 fpsLabel.className = s.color;
                 descDiv.textContent = s.text;
-                descDiv.className = `${s.bg} dark:bg-slate-800 p-4 rounded-lg text-sm ${s.color} border-l-4 ${s.border}`;
-            });
+                descDiv.className = `${s.bg} p-4 rounded-lg text-sm ${s.color} border-l-4 ${s.border} transition-all duration-300 shadow-inner`;
+            };
+
+            slider.addEventListener('input', updateUI);
+            updateUI(); // Trigger initial update
         }
 
         // --- Normal editing ---
@@ -1039,7 +1047,7 @@
                     card.className = "interactive-card bg-blue-50 dark:bg-blue-900/40 p-6 rounded-xl border-2 border-blue-500 text-center group cursor-pointer shadow-md glass transition-all";
                     title.className = "font-bold text-blue-700 dark:text-blue-300";
                 } else {
-                    card.className = "interactive-card bg-white dark:bg-slate-900 p-6 rounded-xl border border-gray-200 dark:border-slate-800 text-center group cursor-pointer glass transition-all";
+                    card.className = "interactive-card bg-white dark:bg-slate-950 p-6 rounded-xl border border-gray-200 dark:border-slate-800 text-center group cursor-pointer glass transition-all";
                     title.className = "font-bold text-gray-800 dark:text-gray-100";
                 }
             });
