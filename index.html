@@ -81,15 +81,11 @@
             max-width: 600px;
             margin-left: auto;
             margin-right: auto;
-            height: 300px;
-            max-height: 400px;
+            height: 380px;
+            max-height: 500px;
         }
 
-        @media (min-width: 768px) {
-            .chart-container {
-                height: 350px;
-            }
-        }
+
 
         .interactive-card {
             transition: all 0.3s ease;
@@ -219,7 +215,7 @@
         <div class="glass rounded-2xl shadow-xl p-6 md:p-8 border border-white/20 dark:border-slate-700/50 mt-8">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
                 <div>
-                    <h3 class="text-xl font-bold text-gray-800 dark:text-gray-100 mb-2 whitespace-nowrap">違和感の正体：リアリズム
+                    <h3 class="text-xl font-bold text-gray-800 dark:text-gray-100 mb-2">違和感の正体：リアリズム
                         vs アニメ的表現</h3>
                     <p class="text-gray-600 dark:text-gray-400 text-sm mb-4 leading-relaxed">
                         物理シミュレーションによる「正確すぎる動き」や「滑らかすぎる陰影」が、アニメ的な記号論と乖離することで違和感が生まれます。
@@ -236,7 +232,7 @@
                         </li>
                     </ul>
                 </div>
-                <div class="chart-container bg-white/50 dark:bg-slate-800/50 rounded-lg p-2">
+                <div class="chart-container bg-white/50 dark:bg-slate-800/50 rounded-lg p-4">
                     <canvas id="gapRadarChart"></canvas>
                 </div>
             </div>
@@ -457,26 +453,26 @@
         <!-- Tabs Navigation -->
         <div class="flex justify-center mb-8">
             <div
-                class="bg-white dark:bg-slate-800 p-1 rounded-xl shadow-sm border border-gray-200 dark:border-slate-700 inline-flex glass">
+                class="bg-white dark:bg-slate-800 p-1 rounded-xl shadow-sm border border-gray-200 dark:border-slate-700 flex flex-col sm:flex-row w-full sm:w-auto glass">
                 <button id="tab-nav-char" onclick="switchTab('char')"
-                    class="px-6 py-3 rounded-lg text-sm font-bold transition-all duration-200 bg-blue-600 text-white shadow-md flex items-center gap-2">
+                    class="px-4 sm:px-6 py-3 rounded-lg text-sm font-bold transition-all duration-200 bg-blue-600 text-white shadow-md flex items-center justify-center gap-2">
                     <i data-lucide="user" class="w-4 h-4"></i> キャラクター制作
                 </button>
                 <button id="tab-nav-bg" onclick="switchTab('bg')"
-                    class="px-6 py-3 rounded-lg text-sm font-bold text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-slate-800 transition-all duration-200 ml-2 flex items-center gap-2">
+                    class="mt-1 sm:mt-0 sm:ml-2 px-4 sm:px-6 py-3 rounded-lg text-sm font-bold text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-slate-800 transition-all duration-200 flex items-center justify-center gap-2">
                     <i data-lucide="image" class="w-4 h-4"></i> 背景美術
                 </button>
                 <button id="tab-nav-vfx" onclick="switchTab('vfx')"
-                    class="px-6 py-3 rounded-lg text-sm font-bold text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-slate-800 transition-all duration-200 ml-2 flex items-center gap-2">
+                    class="mt-1 sm:mt-0 sm:ml-2 px-4 sm:px-6 py-3 rounded-lg text-sm font-bold text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-slate-800 transition-all duration-200 flex items-center justify-center gap-2">
                     <i data-lucide="zap" class="w-4 h-4"></i> 特殊効果
                 </button>
             </div>
         </div>
 
         <!-- Content Area: Character -->
-        <div id="content-char" class="space-y-12 animate-fade-in block">
+        <div id="content-char" class="space-y-6 sm:space-y-12 animate-fade-in block">
             <!-- 1. Shader & Material -->
-            <div class="bg-white dark:bg-slate-950 rounded-2xl p-8 shadow-sm border-l-8 border-blue-500 glass">
+            <div class="bg-white dark:bg-slate-950 rounded-2xl p-5 sm:p-8 shadow-sm border-l-8 border-blue-500 glass">
                 <div class="flex items-start gap-4">
                     <div class="bg-blue-100 dark:bg-blue-900/40 p-3 rounded-lg text-blue-600 dark:text-blue-400">
                         <i data-lucide="palette"></i>
@@ -509,7 +505,7 @@
             </div>
 
             <!-- 2. Camera & Rig -->
-            <div class="bg-white dark:bg-slate-950 rounded-2xl p-8 shadow-sm border-l-8 border-blue-400 glass">
+            <div class="bg-white dark:bg-slate-950 rounded-2xl p-5 sm:p-8 shadow-sm border-l-8 border-blue-400 glass">
                 <div class="flex items-start gap-4">
                     <div class="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg text-blue-500">
                         <i data-lucide="video"></i>
@@ -547,7 +543,7 @@
             </div>
 
             <!-- 3. Composite -->
-            <div class="bg-white dark:bg-slate-950 rounded-2xl p-8 shadow-sm border-l-8 border-indigo-500 glass">
+            <div class="bg-white dark:bg-slate-950 rounded-2xl p-5 sm:p-8 shadow-sm border-l-8 border-indigo-500 glass">
                 <div class="flex items-start gap-4">
                     <div class="bg-indigo-100 dark:bg-indigo-900/30 p-3 rounded-lg text-indigo-600">
                         <i data-lucide="sparkles"></i>
@@ -579,9 +575,9 @@
         </div>
 
         <!-- Content Area: Background -->
-        <div id="content-bg" class="space-y-12 animate-fade-in hidden">
+        <div id="content-bg" class="space-y-6 sm:space-y-12 animate-fade-in hidden">
             <!-- 1. Material & Shader -->
-            <div class="bg-white dark:bg-slate-950 rounded-2xl p-8 shadow-sm border-l-8 border-green-500 glass">
+            <div class="bg-white dark:bg-slate-950 rounded-2xl p-5 sm:p-8 shadow-sm border-l-8 border-green-500 glass">
                 <div class="flex items-start gap-4">
                     <div class="bg-green-100 dark:bg-green-900/30 p-3 rounded-lg text-green-600">
                         <i data-lucide="brush"></i>
@@ -610,7 +606,7 @@
             </div>
 
             <!-- 2. Camera & Layout -->
-            <div class="bg-white dark:bg-slate-950 rounded-2xl p-8 shadow-sm border-l-8 border-green-600 glass">
+            <div class="bg-white dark:bg-slate-950 rounded-2xl p-5 sm:p-8 shadow-sm border-l-8 border-green-600 glass">
                 <div class="flex items-start gap-4">
                     <div class="bg-green-50 dark:bg-green-900/20 p-3 rounded-lg text-green-500">
                         <i data-lucide="ruler"></i>
@@ -627,7 +623,7 @@
             </div>
 
             <!-- 3. Composite -->
-            <div class="bg-white dark:bg-slate-950 rounded-2xl p-8 shadow-sm border-l-8 border-orange-500 glass">
+            <div class="bg-white dark:bg-slate-950 rounded-2xl p-5 sm:p-8 shadow-sm border-l-8 border-orange-500 glass">
                 <div class="flex items-start gap-4">
                     <div class="bg-orange-100 dark:bg-orange-900/30 p-3 rounded-lg text-orange-600">
                         <i data-lucide="cloud-sun"></i>
@@ -660,9 +656,9 @@
         </div>
 
         <!-- Content Area: VFX & Future -->
-        <div id="content-vfx" class="space-y-12 animate-fade-in hidden">
+        <div id="content-vfx" class="space-y-6 sm:space-y-12 animate-fade-in hidden">
             <!-- 1. Particle Simulator -->
-            <div class="bg-white dark:bg-slate-950 rounded-2xl p-8 shadow-sm border-l-8 border-purple-500 glass">
+            <div class="bg-white dark:bg-slate-950 rounded-2xl p-5 sm:p-8 shadow-sm border-l-8 border-purple-500 glass">
                 <div class="flex items-start gap-4 mb-6">
                     <div class="bg-purple-100 dark:bg-purple-900/30 p-3 rounded-lg text-purple-600">
                         <i data-lucide="wand-2"></i>
@@ -693,7 +689,7 @@
             </div>
 
             <!-- 2. Production Revolution -->
-            <div class="bg-white dark:bg-slate-950 rounded-2xl p-8 shadow-sm border-l-8 border-indigo-600 glass">
+            <div class="bg-white dark:bg-slate-950 rounded-2xl p-5 sm:p-8 shadow-sm border-l-8 border-indigo-600 glass">
                 <div class="flex items-start gap-4">
                     <div class="bg-indigo-100 dark:bg-indigo-900/30 p-3 rounded-lg text-indigo-600">
                         <i data-lucide="gamepad-2"></i>
@@ -725,7 +721,7 @@
             </div>
 
             <!-- 3. Future Tech (AI) -->
-            <div class="bg-white dark:bg-slate-950 rounded-2xl p-8 shadow-sm border-l-8 border-gray-500 glass">
+            <div class="bg-white dark:bg-slate-950 rounded-2xl p-5 sm:p-8 shadow-sm border-l-8 border-gray-500 glass">
                 <div class="flex items-start gap-4">
                     <div class="bg-gray-100 dark:bg-slate-800 p-3 rounded-lg text-gray-500">
                         <i data-lucide="brain"></i>
@@ -888,7 +884,7 @@
             const isDark = theme === 'dark';
             const textColor = isDark ? '#94a3b8' : '#718096';
             const gridColor = isDark ? '#334155' : '#e2e8f0';
-            const tickBackdrop = isDark ? 'rgba(2, 6, 23, 1)' : 'rgba(255, 255, 255, 0.8)';
+            const tickBackdrop = 'transparent';
 
             if (isDark) {
                 document.documentElement.classList.add('dark');
@@ -958,8 +954,36 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    scales: { r: { suggestedMin: 0, suggestedMax: 100 } },
-                    plugins: { legend: { position: 'bottom', labels: { boxWidth: 10 } } }
+                    layout: {
+                        padding: {
+                            top: 15,
+                            right: 15,
+                            bottom: 15,
+                            left: 15
+                        }
+                    },
+                    scales: {
+                        r: {
+                            suggestedMin: 0,
+                            suggestedMax: 100,
+                            pointLabels: {
+                                font: {
+                                    size: window.innerWidth < 768 ? 10 : 12
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                boxWidth: 10,
+                                font: {
+                                    size: window.innerWidth < 768 ? 11 : 12
+                                }
+                            }
+                        }
+                    }
                 }
             });
 
